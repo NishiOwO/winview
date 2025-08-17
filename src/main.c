@@ -1,7 +1,7 @@
 #include <wvcommon.h>
 #include <wvresource.h>
 
-HWND hStatus, hProgress;
+HWND hStatus, hProgress, hListbox;
 HINSTANCE hInst;
 HFONT fixedsys, bifixedsys;
 
@@ -15,7 +15,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		PostQuitMessage(0);
 	}else if(msg == WM_SIZE){
 		int parts[2];
-		RECT r;
+		RECT r, r2;
 		SendMessage(hStatus, WM_SIZE, wp, lp);
 
 		parts[0] = LOWORD(lp) - 100;
@@ -26,6 +26,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		SendMessage(hStatus, SB_GETRECT, 1, (LPARAM)&r);
 
 		SetWindowPos(hProgress, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, 0);
+
+		GetClientRect(hStatus, &r2);
+
+		GetClientRect(hWnd, &r);
+		r.bottom -= r2.bottom - r2.top;
+		r.right -= 100;
+
+		SetWindowPos(hListbox, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, 0);
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
 	}
@@ -50,7 +58,7 @@ BOOL InitClass(void){
 }
 
 BOOL InitWindow(int nCmdShow){
-	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW ^ (WS_MAXIMIZEBOX | WS_THICKFRAME), CW_USEDEFAULT, CW_USEDEFAULT, 400, 300, NULL, 0, hInst, NULL);
+	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW ^ (WS_MAXIMIZEBOX | WS_THICKFRAME), CW_USEDEFAULT, CW_USEDEFAULT, 440, 440 / 4 * 3, NULL, 0, hInst, NULL);
 	HDC dc;
 	int parts[2];
 	char txt[256];
@@ -69,6 +77,8 @@ BOOL InitWindow(int nCmdShow){
 
 	sprintf(txt, "Ready - Version %s", wvversion);
 	SetStatus(txt);
+
+	hListbox = CreateWindow("LISTBOX", "", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LBS_NOTIFY | LBS_NOINTEGRALHEIGHT, 0, 0, 0, 0, hWnd, (HMENU)IDM_LISTBOX, hInst, NULL);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);

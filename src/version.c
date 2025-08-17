@@ -19,6 +19,9 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	}else if(msg == WM_KEYDOWN){
 		if(wp == 'Q' || wp == VK_ESCAPE) EndDialog(hWnd, 0);
 	}else if(msg == WM_INITDIALOG){
+		RECT r;
+		GetWindowRect(hWnd, &r);
+		SetWindowPos(hWnd, NULL, 0, 0, 440, 440 / 4 * 3, SWP_NOMOVE);
 	}else if(msg == WM_PAINT){
 		PAINTSTRUCT ps;
 		RECT r;
