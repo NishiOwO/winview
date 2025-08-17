@@ -4,7 +4,7 @@
 
 //1 24 "winview.manifest"
 
-WVLOGO ICON "winview.ico"
+WVLOGO ICON "images/winview.ico"
 WVMENU MENU {
 	POPUP "&File" {
 		MENUITEM "&Quit", IDM_FILE_QUIT
@@ -19,4 +19,6 @@ WVVERSION DIALOG 0, 0, 0, 0
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Version Information" {
 }
-WVVERSIONBMP BITMAP "version.bmp"
+WVVERSIONBMP BITMAP "images/version.bmp"
+
+WVFAILED BITMAP "images/failed.bmp"

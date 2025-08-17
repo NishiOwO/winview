@@ -13,6 +13,7 @@ LIBS = -lgdi32 -lcomctl32 -lcomdlg32
 all: winview.exe
 
 OBJS += src/ds.o src/main.o src/version.o src/util.o src/image.o
+OBJS += src/tiff.o src/png.o src/jpeg.o
 OBJS += src/winview.res
 include deps.mk
 

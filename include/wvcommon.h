@@ -14,7 +14,7 @@
 extern HINSTANCE hInst;
 extern HFONT fixedsys;
 extern HFONT bifixedsys;
-extern HWND hStatus, hProgress, hListbox;
+extern HWND hMain, hStatus, hProgress, hListbox;
 
 /* version.c */
 extern const char* wvversion;
@@ -29,8 +29,10 @@ void SetStatus(const char* text);
 char* DuplicateString(const char* str);
 
 /* image.c */
+extern HWND hImage;
 void QueueImage(const char* path, const char* title);
 void ShowImage(int index);
 void DeleteImage(int index);
+BOOL InitImageClass(void);
 
 #endif

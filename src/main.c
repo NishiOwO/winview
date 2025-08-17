@@ -15,7 +15,7 @@ button_t buttons[] = {
 	{"&Delete", 'D', 0, NULL}
 };
 
-HWND hStatus, hProgress, hListbox;
+HWND hMain, hStatus, hProgress, hListbox;
 HINSTANCE hInst;
 HFONT fixedsys, bifixedsys;
 
@@ -24,6 +24,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		int m = LOWORD(wp);
 		if(m == IDM_FILE_QUIT) DestroyWindow(hWnd);
 		if(m == IDM_ABOUT_VERSION) DialogBox(hInst, "WVVERSION", hWnd, (DLGPROC)VersionDialog);
+		if(m == IDM_LISTBOX){
+			if(HIWORD(wp) == LBN_DBLCLK){
+				ShowImage(SendMessage(hListbox, LB_GETCURSEL, 0, 0));
+			}
+		}
 		if(m >= IDM_BUTTONS && m < (IDM_BUTTONS + 100)){
 			int id = buttons[m - IDM_BUTTONS].id;
 			if(id == 'L'){
@@ -122,6 +127,8 @@ BOOL InitWindow(int nCmdShow){
 
 	if(hWnd == NULL) return FALSE;
 
+	hMain = hWnd;
+
 	parts[0] = 0;
 	parts[1] = 100;
 	hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | CCS_BOTTOM, 0, 0, 0, 0, hWnd, (HMENU)IDM_STATUS, hInst, NULL);
@@ -157,6 +164,10 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		return FALSE;
 	}
 
+	if(!InitImageClass()){
+		return FALSE;
+	}
+
 	InitCommonControls();
 
 	fixedsys = CreateFont(14, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
@@ -167,6 +178,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	}
 
 	QueueImage("Z:/home/nishi/Git/winview/puneet.png", "puneet.png");
+	QueueImage("Z:/home/nishi/Git/winview/puneet.jpg", "puneet.jpg");
+	QueueImage("Z:/home/nishi/Git/winview/puneet.tiff", "puneet.tiff");
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
 		if(bret == -1) break;
