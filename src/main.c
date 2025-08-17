@@ -2,6 +2,7 @@
 #include <wvresource.h>
 
 HINSTANCE hInst;
+HFONT fixedsys, bifixedsys;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_COMMAND){
@@ -35,6 +36,7 @@ BOOL InitClass(void){
 
 BOOL InitWindow(int nCmdShow){
 	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, NULL, 0, hInst, NULL);
+	HDC dc;
 
 	if(hWnd == NULL) return FALSE;
 
@@ -43,8 +45,6 @@ BOOL InitWindow(int nCmdShow){
 
 	return TRUE;
 }
-
-HBRUSH brblack;
 
 int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow){
 	BOOL bret;
@@ -55,11 +55,12 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		return FALSE;
 	}
 
+	fixedsys = CreateFont(14, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
+	bifixedsys = CreateFont(14*5, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
+
 	if(!InitWindow(nCmdShow)){
 		return FALSE;
 	}
-
-	brblack = CreateSolidBrush(RGB(0, 0, 0));
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
 		if(bret == -1) break;

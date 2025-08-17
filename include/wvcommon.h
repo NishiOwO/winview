@@ -8,9 +8,13 @@
 #include <stdio.h>
 
 extern HINSTANCE hInst;
+extern HFONT fixedsys;
+extern HFONT bifixedsys;
 extern const char* wvversion;
 
 LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
-HBRUSH GetBrushCached(int r, int g, int b);
+HBRUSH GetSolidBrushCached(int r, int g, int b);
+HBRUSH GetHatchBrushCached(int r, int g, int b);
+void ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h);
 
 #endif
