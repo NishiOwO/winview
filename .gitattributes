@@ -1,8 +1,9 @@
-/libjpeg/src/*.c linguist-generated
-/libjpeg/include/*.h linguist-generated
-/libpng/src/*.c linguist-generated
-/libpng/include/*.h linguist-generated
-/libtiff/src/*.c linguist-generated
-/libtiff/include/*.h linguist-generated
-/libz/src/*.c linguist-generated
-/libz/include/*.h linguist-generated
+/external/libjpeg/src/*.c linguist-generated
+/external/libjpeg/include/*.h linguist-generated
+/external/libpng/src/*.c linguist-generated
+/external/libpng/include/*.h linguist-generated
+/external/libtiff/src/*.c linguist-generated
+/external/libtiff/include/*.h linguist-generated
+/external/libz/src/*.c linguist-generated
+/external/libz/include/*.h linguist-generated
+/deps.mk linguist-generated

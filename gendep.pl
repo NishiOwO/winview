@@ -3,7 +3,7 @@
 sub scan_proj {
 	print(uc($_[0]) . "_OBJS =");
 
-	opendir(my $dh, "$_[0]/src");
+	opendir(my $dh, "external/$_[0]/src");
 	my @files = readdir($dh);
 	foreach my $fn (@files){
 		if(($fn eq ".") || ($fn eq "..")){
@@ -11,15 +11,15 @@ sub scan_proj {
 		}
 
 		$fn =~ s/\.c$/.o/;
-		print(" $_[0]/src/$fn");
+		print(" external/$_[0]/src/$fn");
 	}
 
 	closedir($dh);
 
 	print("\n");
-	print("CFLAGS += -I$_[0]/include\n");
-	print("OBJS += $_[0].a\n");
-	print("$_[0].a: \$(" . uc($_[0]) . "_OBJS)\n");
+	print("CFLAGS += -Iexternal/$_[0]/include\n");
+	print("OBJS += external/$_[0].a\n");
+	print("external/$_[0].a: \$(" . uc($_[0]) . "_OBJS)\n");
 	print("\t\$(AR) rcs \$@ \$(" . uc($_[0]) . "_OBJS)\n");
 	print("\n");
 }
