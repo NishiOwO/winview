@@ -32,6 +32,7 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		RECT r;
 		HDC dc = BeginPaint(hWnd, &ps);
 		GetClientRect(hWnd, &r);
+		SetStretchBltMode(dc, HALFTONE);
 		if(image_bmp == NULL){
 			ShowBitmapSize(dc, "WVFAILED", 0, 0, r.right - r.left, r.bottom - r.top);
 		}else{
@@ -45,12 +46,17 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		hImage = NULL;
 		DestroyWindow(hWnd);
 	}else if(msg == WM_FINISHED_IMAGE){
+		RECT r;
+		int style;
 		InvalidateRect(hWnd, 0, TRUE);
 		if(image_bmp == NULL){
-			SetWindowPos(hWnd, NULL, 0, 0, 320, 240, SWP_NOMOVE);
+			SetRect(&r, 0, 0, 320, 240);
 		}else{
-			SetWindowPos(hWnd, NULL, 0, 0, image_width, image_height, SWP_NOMOVE);
+			SetRect(&r, 0, 0, image_width, image_height);
 		}
+		style = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
+		AdjustWindowRect(&r, style, FALSE);
+		SetWindowPos(hWnd, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
 	}
@@ -87,6 +93,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 			unsigned char* data;
 			LockWinViewMutex(image_mutex);
 			if(image_kill){
+				img->close(img);
 				UnlockWinViewMutex(image_mutex);
 				return 0;
 			}
