@@ -70,5 +70,5 @@ void SetProgress(int value){
 }
 
 void SetStatus(const char* text){
-	SendMessage(hStatus, SB_SETTEXT, 1, (LPARAM)text);
+	SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)text);
 }

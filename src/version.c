@@ -16,6 +16,8 @@ static const char* texts[] = {
 LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_CLOSE){
 		EndDialog(hWnd, 0);
+	}else if(msg == WM_KEYDOWN){
+		if(wp == 'Q' || wp == VK_ESCAPE) EndDialog(hWnd, 0);
 	}else if(msg == WM_INITDIALOG){
 	}else if(msg == WM_PAINT){
 		PAINTSTRUCT ps;

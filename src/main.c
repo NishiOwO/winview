@@ -7,23 +7,23 @@ HFONT fixedsys, bifixedsys;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_COMMAND){
+		if(LOWORD(wp) == IDM_FILE_QUIT) DestroyWindow(hWnd);
 		if(LOWORD(wp) == IDM_ABOUT_VERSION) DialogBox(hInst, "WVVERSION", hWnd, (DLGPROC)VersionDialog);
 	}else if(msg == WM_CLOSE){
 		DestroyWindow(hWnd);
 	}else if(msg == WM_DESTROY){
 		PostQuitMessage(0);
 	}else if(msg == WM_SIZE){
-		int parts[3];
+		int parts[2];
 		RECT r;
 		SendMessage(hStatus, WM_SIZE, wp, lp);
 
-		parts[0] = LOWORD(lp) - 100 - 200;
-		parts[1] = LOWORD(lp) - 100;
-		parts[2] = -1;
+		parts[0] = LOWORD(lp) - 100;
+		parts[1] = -1;
 
-		SendMessage(hStatus, SB_SETPARTS, 3, (LPARAM)parts);
+		SendMessage(hStatus, SB_SETPARTS, 2, (LPARAM)parts);
 
-		SendMessage(hStatus, SB_GETRECT, 2, (LPARAM)&r);
+		SendMessage(hStatus, SB_GETRECT, 1, (LPARAM)&r);
 
 		SetWindowPos(hProgress, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, 0);
 	}else{
@@ -50,19 +50,18 @@ BOOL InitClass(void){
 }
 
 BOOL InitWindow(int nCmdShow){
-	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, NULL, 0, hInst, NULL);
+	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW ^ (WS_MAXIMIZEBOX | WS_THICKFRAME), CW_USEDEFAULT, CW_USEDEFAULT, 400, 300, NULL, 0, hInst, NULL);
 	HDC dc;
-	int parts[3];
+	int parts[2];
 	char txt[256];
 
 	if(hWnd == NULL) return FALSE;
 
 	parts[0] = 0;
 	parts[1] = 100;
-	parts[2] = 200;
 	hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | CCS_BOTTOM, 0, 0, 0, 0, hWnd, (HMENU)IDM_STATUS, hInst, NULL);
 	SendMessage(hStatus, SB_SIMPLE, FALSE, 0);
-	SendMessage(hStatus, SB_SETPARTS, 3, (LPARAM)parts);
+	SendMessage(hStatus, SB_SETPARTS, 2, (LPARAM)parts);
 
 	hProgress = CreateWindowEx(0, PROGRESS_CLASS, NULL, WS_CHILD | WS_VISIBLE | PBS_SMOOTH, 0, 0, 0, 0, hStatus, (HMENU)IDM_STATUS_PROGRESS, hInst, NULL);
 	SendMessage(hProgress, PBM_SETRANGE, 0, MAKELONG(0, 100));
