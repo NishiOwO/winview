@@ -7,11 +7,11 @@ typedef struct pngopaque {
 	png_infop info;
 } pngopaque_t;
 
-static void user_error(png_structp png, const char* str){
+static void PNGCAPI user_error(png_structp png, const char* str){
 	longjmp(png_jmpbuf(png), 1);
 }
 
-static void user_warning(png_structp png, const char* str){
+static void PNGCAPI user_warning(png_structp png, const char* str){
 }
 
 static unsigned char* PNGDriverRead(void* ptr){

@@ -2,10 +2,12 @@ TARGET = x86_64-w64-mingw32-
 CC = $(TARGET)gcc
 AR = $(TARGET)ar
 RC = $(TARGET)windres
-CFLAGS = -DHAVE_CONFIG_H -g -I include -mwindows
+CFLAGS = -DHAVE_CONFIG_H -I include -mwindows -O2
 RCFLAGS = -I include
-LDFLAGS =
+LDFLAGS = -mwindows
 LIBS = -lgdi32 -lcomctl32 -lcomdlg32
+
+-include mk/$(OPTMK).mk
 
 .PHONY: all clean
 .SUFFIXES: .c .o .rc .res
@@ -19,6 +21,7 @@ include deps.mk
 
 winview.exe: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(AFTERCMD)
 
 .rc.res:
 	$(RC) $(RCFLAGS) -Ocoff $< $@
