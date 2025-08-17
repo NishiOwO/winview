@@ -6,7 +6,7 @@ sub scan_proj {
 	opendir(my $dh, "$_[0]/src");
 	my @files = readdir($dh);
 	foreach my $fn (@files){
-		if(($fn eq ".") || ($fn eq "..") || ($fn eq "tif_unix.c")){
+		if(($fn eq ".") || ($fn eq "..")){
 			next;
 		}
 
@@ -18,6 +18,7 @@ sub scan_proj {
 
 	print("\n");
 	print("CFLAGS += -I$_[0]/include\n");
+	print("OBJS += $_[0].a\n");
 	print("$_[0].a: \$(" . uc($_[0]) . "_OBJS)\n");
 	print("\t\$(AR) rcs \$@ \$(" . uc($_[0]) . "_OBJS)\n");
 	print("\n");
