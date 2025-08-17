@@ -16,12 +16,12 @@ BOOL InitClass(void){
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInst;
-	wc.hIcon = LoadIcon(hInst, "LOGO");
+	wc.hIcon = LoadIcon(hInst, "WVLOGO");
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = GetSysColorBrush(COLOR_MENU);
-	wc.lpszMenuName = NULL;
+	wc.lpszMenuName = "wvmenu";
 	wc.lpszClassName = "winview";
-	wc.hIconSm = LoadIcon(hInst, "LOGO");
+	wc.hIconSm = LoadIcon(hInst, "WVLOGO");
 	return RegisterClassEx(&wc);
 }
 

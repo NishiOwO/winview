@@ -10,7 +10,8 @@ LDFLAGS =
 
 all: winview.exe
 
-OBJS += src/main.o src/winview.res
+OBJS += src/main.o src/version.o
+OBJS += src/winview.res
 include deps.mk
 
 winview.exe: $(OBJS)

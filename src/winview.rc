@@ -1,3 +1,8 @@
 #include <winver.h>
 
-LOGO ICON "winview.ico"
+WVLOGO ICON "winview.ico"
+WVMENU MENU {
+	POPUP "&About", HELP { /* 100 */
+		MENUITEM "&Version", 101
+	}
+}
