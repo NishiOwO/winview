@@ -16,7 +16,8 @@ void QueueImage(const char* path, const char* title){
 
 DriverProc* drivers[] = {
 	TryPNGDriver,
-	TryJPEGDriver
+	TryJPEGDriver,
+	TryTIFFDriver
 };
 HWND hImage = NULL;
 HANDLE image_thread = NULL;
@@ -103,7 +104,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 					q->rgbGreen = px[1];
 					q->rgbBlue = px[2];
 
-					c = ((i / 32 + j / 32) % 2) ? 0x80 : 0x60;
+					c = ((i / 16 + j / 16) % 2) ? 0x80 : 0x60;
 
 					q->rgbRed += op * c;
 					q->rgbGreen += op * c;

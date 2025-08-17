@@ -7,6 +7,13 @@ typedef struct pngopaque {
 	png_infop info;
 } pngopaque_t;
 
+static void user_error(png_structp png, const char* str){
+	longjmp(png_jmpbuf(png), 1);
+}
+
+static void user_warning(png_structp png, const char* str){
+}
+
 static unsigned char* PNGDriverRead(void* ptr){
 	wvimage_t* img = ptr;
 	pngopaque_t* opaque = img->opaque;
@@ -50,6 +57,8 @@ wvimage_t* TryPNGDriver(const char* path){
 		PNGDriverClose(img);
 		return NULL;
 	}
+
+	png_set_error_fn(opaque->png, NULL, user_error, user_warning);
 
 	png_init_io(opaque->png, f);
 	png_read_info(opaque->png, opaque->info);
