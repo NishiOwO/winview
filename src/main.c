@@ -1,6 +1,7 @@
 #include <wvcommon.h>
 #include <wvresource.h>
 
+HWND hStatus, hProgress;
 HINSTANCE hInst;
 HFONT fixedsys, bifixedsys;
 
@@ -11,6 +12,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		DestroyWindow(hWnd);
 	}else if(msg == WM_DESTROY){
 		PostQuitMessage(0);
+	}else if(msg == WM_SIZE){
+		int parts[3];
+		RECT r;
+		SendMessage(hStatus, WM_SIZE, wp, lp);
+
+		parts[0] = LOWORD(lp) - 100 - 200;
+		parts[1] = LOWORD(lp) - 100;
+		parts[2] = -1;
+
+		SendMessage(hStatus, SB_SETPARTS, 3, (LPARAM)parts);
+
+		SendMessage(hStatus, SB_GETRECT, 2, (LPARAM)&r);
+
+		SetWindowPos(hProgress, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, 0);
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
 	}
@@ -37,8 +52,22 @@ BOOL InitClass(void){
 BOOL InitWindow(int nCmdShow){
 	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, NULL, 0, hInst, NULL);
 	HDC dc;
+	int parts[3];
 
 	if(hWnd == NULL) return FALSE;
+
+	parts[0] = 0;
+	parts[1] = 100;
+	parts[2] = 200;
+	hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | CCS_BOTTOM, 0, 0, 0, 0, hWnd, (HMENU)IDM_STATUS, hInst, NULL);
+	SendMessage(hStatus, SB_SIMPLE, FALSE, 0);
+	SendMessage(hStatus, SB_SETPARTS, 3, (LPARAM)parts);
+
+	hProgress = CreateWindowEx(0, PROGRESS_CLASS, NULL, WS_CHILD | WS_VISIBLE | PBS_SMOOTH, 0, 0, 0, 0, hStatus, (HMENU)IDM_STATUS_PROGRESS, hInst, NULL);
+	SendMessage(hProgress, PBM_SETRANGE, 0, MAKELONG(0, 100));
+	SendMessage(hProgress, PBM_SETPOS, 0, 0);
+
+	SetStatus("Ready");
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -54,6 +83,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	if(!InitClass()){
 		return FALSE;
 	}
+
+	InitCommonControls();
 
 	fixedsys = CreateFont(14, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
 	bifixedsys = CreateFont(14*5, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);

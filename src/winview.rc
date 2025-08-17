@@ -2,6 +2,8 @@
 
 #include <wvresource.h>
 
+//1 24 "winview.manifest"
+
 WVLOGO ICON "winview.ico"
 WVMENU MENU {
 	POPUP "&About", HELP {

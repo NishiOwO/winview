@@ -2,10 +2,10 @@ TARGET = x86_64-w64-mingw32-
 CC = $(TARGET)gcc
 AR = $(TARGET)ar
 RC = $(TARGET)windres
-CFLAGS = -DHAVE_CONFIG_H -O2 -I include
+CFLAGS = -DHAVE_CONFIG_H -O2 -I include -mwindows
 RCFLAGS = -I include
-LDFLAGS =
-LIBS = -lgdi32
+LDFLAGS = -mwindows
+LIBS = -lgdi32 -lcomctl32
 
 .PHONY: all clean
 .SUFFIXES: .c .o .rc .res

@@ -64,3 +64,11 @@ HBRUSH GetHatchBrushCached(int r, int g, int b){
 
 	return c.brush;
 }
+
+void SetProgress(int value){
+	SendMessage(hProgress, PBM_SETPOS, value, 0);
+}
+
+void SetStatus(const char* text){
+	SendMessage(hStatus, SB_SETTEXT, 1, (LPARAM)text);
+}

@@ -44,7 +44,11 @@
 #define TIFF_UINT8_T uint8_t
 
 /* Signed size type */
+#ifdef __WATCOMC__
+#define TIFF_SSIZE_T signed
+#else
 #define TIFF_SSIZE_T ssize_t
+#endif
 
 /* Compatibility stuff. */
 
