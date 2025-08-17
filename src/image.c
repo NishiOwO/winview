@@ -15,7 +15,8 @@ void QueueImage(const char* path, const char* title){
 }
 
 DriverProc* drivers[] = {
-	TryPNGDriver
+	TryPNGDriver,
+	TryJPEGDriver
 };
 HWND hImage = NULL;
 HANDLE image_thread = NULL;

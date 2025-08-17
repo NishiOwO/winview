@@ -30,7 +30,7 @@ typedef wvimage_t*(DriverProc)(const char* path);
 #define Allocate(var) var = malloc(sizeof(*var));memset(var, 0, sizeof(*var));
 
 /* image drivers */
-wvimage_t* TryJEPGDriver(const char* path);
+wvimage_t* TryJPEGDriver(const char* path);
 wvimage_t* TryPNGDriver(const char* path);
 wvimage_t* TryTIFFDriver(const char* path);
 

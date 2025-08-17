@@ -37,6 +37,7 @@ wvimage_t* TryPNGDriver(const char* path){
 
 	img = AllocateImage();
 
+	img->name = "PNG";
 	img->close = PNGDriverClose;
 	img->read = PNGDriverRead;
 
@@ -55,7 +56,6 @@ wvimage_t* TryPNGDriver(const char* path){
 
 	img->width = png_get_image_width(opaque->png, opaque->info);
 	img->height = png_get_image_height(opaque->png, opaque->info);
-	img->name = "PNG";
 	depth = png_get_bit_depth(opaque->png, opaque->info);
 	type = png_get_color_type(opaque->png, opaque->info);
 
