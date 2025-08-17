@@ -1,0 +1,8 @@
+/libjpeg/src/*.c linguist-generated
+/libjpeg/include/*.h linguist-generated
+/libpng/src/*.c linguist-generated
+/libpng/include/*.h linguist-generated
+/libtiff/src/*.c linguist-generated
+/libtiff/include/*.h linguist-generated
+/libz/src/*.c linguist-generated
+/libz/include/*.h linguist-generated
