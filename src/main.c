@@ -53,6 +53,7 @@ BOOL InitWindow(int nCmdShow){
 	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, NULL, 0, hInst, NULL);
 	HDC dc;
 	int parts[3];
+	char txt[256];
 
 	if(hWnd == NULL) return FALSE;
 
@@ -67,7 +68,8 @@ BOOL InitWindow(int nCmdShow){
 	SendMessage(hProgress, PBM_SETRANGE, 0, MAKELONG(0, 100));
 	SendMessage(hProgress, PBM_SETPOS, 0, 0);
 
-	SetStatus("Ready");
+	sprintf(txt, "Ready - Version %s", wvversion);
+	SetStatus(txt);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
