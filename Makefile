@@ -4,15 +4,15 @@ AR = $(TARGET)ar
 RC = $(TARGET)windres
 CFLAGS = -DHAVE_CONFIG_H -O2 -I include -mwindows
 RCFLAGS = -I include
-LDFLAGS = -mwindows
-LIBS = -lgdi32 -lcomctl32
+LDFLAGS =
+LIBS = -lgdi32 -lcomctl32 -lcomdlg32
 
 .PHONY: all clean
 .SUFFIXES: .c .o .rc .res
 
 all: winview.exe
 
-OBJS += src/ds.o src/main.o src/version.o src/util.o
+OBJS += src/ds.o src/main.o src/version.o src/util.o src/image.o
 OBJS += src/winview.res
 include deps.mk
 

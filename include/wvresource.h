@@ -12,4 +12,7 @@
 #define IDM_ABOUT (1030)
 #define IDM_ABOUT_VERSION (IDM_ABOUT + 1)
 
+/* 1100-1199 */
+#define IDM_BUTTONS (1100)
+
 #endif

@@ -72,3 +72,9 @@ void SetProgress(int value){
 void SetStatus(const char* text){
 	SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)text);
 }
+
+char* DuplicateString(const char* str){
+	char* r = malloc(strlen(str) + 1);
+	strcpy(r, str);
+	return r;
+}
