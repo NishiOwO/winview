@@ -1,11 +1,19 @@
-#include <windows.h>
-
 #include <wvcommon.h>
+#include <wvresource.h>
 
 HINSTANCE hInst;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
-	return DefWindowProc(hWnd, msg, wp, lp);
+	if(msg == WM_COMMAND){
+		if(LOWORD(wp) == IDM_ABOUT_VERSION) DialogBox(hInst, "WVVERSION", hWnd, (DLGPROC)VersionDialog);
+	}else if(msg == WM_CLOSE){
+		DestroyWindow(hWnd);
+	}else if(msg == WM_DESTROY){
+		PostQuitMessage(0);
+	}else{
+		return DefWindowProc(hWnd, msg, wp, lp);
+	}
+	return 0;
 }
 
 BOOL InitClass(void){
@@ -36,6 +44,8 @@ BOOL InitWindow(int nCmdShow){
 	return TRUE;
 }
 
+HBRUSH brblack;
+
 int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow){
 	BOOL bret;
 	MSG msg;
@@ -48,6 +58,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	if(!InitWindow(nCmdShow)){
 		return FALSE;
 	}
+
+	brblack = CreateSolidBrush(RGB(0, 0, 0));
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
 		if(bret == -1) break;

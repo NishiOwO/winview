@@ -7,3 +7,4 @@
 /external/libz/src/*.c linguist-generated
 /external/libz/include/*.h linguist-generated
 /deps.mk linguist-generated
+/include/stb_ds.h linguist-generated

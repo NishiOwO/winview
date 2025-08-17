@@ -1,8 +1,16 @@
-#include <winver.h>
+#include <windows.h>
+
+#include <wvresource.h>
 
 WVLOGO ICON "winview.ico"
 WVMENU MENU {
-	POPUP "&About", HELP { /* 100 */
-		MENUITEM "&Version", 101
+	POPUP "&About", HELP {
+		MENUITEM "&Version", IDM_ABOUT_VERSION
 	}
 }
+
+WVVERSION DIALOG 0, 0, 200, 50
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Version Information" {
+}
+WVVERSIONBMP BITMAP "version.bmp"

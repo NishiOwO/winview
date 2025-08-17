@@ -3,14 +3,16 @@ CC = $(TARGET)gcc
 AR = $(TARGET)ar
 RC = $(TARGET)windres
 CFLAGS = -DHAVE_CONFIG_H -O2 -I include
+RCFLAGS = -I include
 LDFLAGS =
+LIBS = -lgdi32
 
 .PHONY: all clean
 .SUFFIXES: .c .o .rc .res
 
 all: winview.exe
 
-OBJS += src/main.o src/version.o
+OBJS += src/ds.o src/main.o src/version.o src/util.o
 OBJS += src/winview.res
 include deps.mk
 
@@ -18,7 +20,7 @@ winview.exe: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
 .rc.res:
-	$(RC) -Ocoff $< $@
+	$(RC) $(RCFLAGS) -Ocoff $< $@
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
