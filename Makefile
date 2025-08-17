@@ -2,7 +2,7 @@ TARGET = x86_64-w64-mingw32-
 CC = $(TARGET)gcc
 AR = $(TARGET)ar
 RC = $(TARGET)windres
-CFLAGS = -DHAVE_CONFIG_H -O2
+CFLAGS = -DHAVE_CONFIG_H -O2 -I include
 LDFLAGS =
 
 .PHONY: all clean
