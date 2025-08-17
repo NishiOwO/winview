@@ -1,0 +1,3 @@
+#include <winver.h>
+
+LOGO ICON "winview.ico"
