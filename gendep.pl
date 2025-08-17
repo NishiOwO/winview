@@ -24,7 +24,7 @@ sub scan_proj {
 	print("\n");
 }
 
-scan_proj("libz");
 scan_proj("libpng");
 scan_proj("libjpeg");
 scan_proj("libtiff");
+scan_proj("libz");

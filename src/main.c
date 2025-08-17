@@ -62,6 +62,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		DestroyWindow(hWnd);
 	}else if(msg == WM_DESTROY){
 		PostQuitMessage(0);
+	}else if(msg == WM_SB_SETTEXT){
+		SendMessage(hStatus, SB_SETTEXT, wp, lp);
 	}else if(msg == WM_SIZE){
 		int parts[2];
 		RECT r, r2;
@@ -176,10 +178,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	if(!InitWindow(nCmdShow)){
 		return FALSE;
 	}
-
-	QueueImage("Z:/home/nishi/Git/winview/puneet.png", "puneet.png");
-	QueueImage("Z:/home/nishi/Git/winview/puneet.jpg", "puneet.jpg");
-	QueueImage("Z:/home/nishi/Git/winview/puneet.tiff", "puneet.tiff");
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
 		if(bret == -1) break;

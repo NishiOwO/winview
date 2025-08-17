@@ -46,7 +46,7 @@ HBRUSH GetSolidBrushCached(int r, int g, int b){
 
 static brushcache_t* hatchcache = NULL;
 HBRUSH GetHatchBrushCached(int r, int g, int b){
-	int i; \
+	int i;
 	brushcache_t c;
 
 	for(i = 0; i < arrlen(hatchcache); i++){
@@ -66,15 +66,58 @@ HBRUSH GetHatchBrushCached(int r, int g, int b){
 }
 
 void SetProgress(int value){
-	SendMessage(hProgress, PBM_SETPOS, value, 0);
+	PostMessage(hProgress, PBM_SETPOS, value, 0);
 }
 
 void SetStatus(const char* text){
-	SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)text);
+	PostMessage(hMain, WM_SB_SETTEXT, 0, (LPARAM)text);
 }
 
 char* DuplicateString(const char* str){
 	char* r = malloc(strlen(str) + 1);
 	strcpy(r, str);
 	return r;
+}
+
+wvimage_t* AllocateImage(void){
+	wvimage_t* r = malloc(sizeof(*r));
+	memset(r, 0, sizeof(*r));
+
+	return r;
+}
+
+HANDLE CreateWinViewMutex(void){
+	return CreateEvent(NULL, FALSE, TRUE, NULL);
+}
+
+void DestroyWinViewMutex(HANDLE mutex){
+	CloseHandle(mutex);
+}
+
+void LockWinViewMutex(HANDLE mutex){
+	WaitForSingleObject(mutex, INFINITE);
+}
+
+void UnlockWinViewMutex(HANDLE mutex){
+	SetEvent(mutex);
+}
+
+void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad){
+	HDC dc = GetDC(NULL);
+	BITMAPINFOHEADER bmih;
+
+	bmih.biSize = sizeof(bmih);
+	bmih.biWidth = w;
+	bmih.biHeight = -(LONG)h;
+	bmih.biPlanes = 1;
+	bmih.biBitCount = 32;
+	bmih.biCompression = BI_RGB;
+	bmih.biSizeImage = 0;
+	bmih.biXPelsPerMeter = 0;
+	bmih.biYPelsPerMeter = 0;
+	bmih.biClrUsed = 0;
+	bmih.biClrImportant = 0;
+
+	*bmp = CreateDIBSection(dc, (BITMAPINFO*)&bmih, DIB_RGB_COLORS, (void**)quad, NULL, (DWORD)0);
+	ReleaseDC(NULL, dc);
 }
