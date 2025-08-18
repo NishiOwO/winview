@@ -33,6 +33,7 @@ typedef wvimage_t*(DriverProc)(const char* path);
 wvimage_t* TryJPEGDriver(const char* path);
 wvimage_t* TryPNGDriver(const char* path);
 wvimage_t* TryTIFFDriver(const char* path);
+wvimage_t* TryImageRSDriver(const char* path);
 
 /* main.c */
 extern HINSTANCE hInst;

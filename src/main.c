@@ -66,7 +66,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 
 				of.lStructSize = sizeof(of);
 				of.hwndOwner = hWnd;
-				of.lpstrFilter = "JPEG\0*.jpg;*.jpeg\0PNG\0*.png\0TIFF\0*.tiff;*.tif\0All Files\0*.*\0\0";
+				of.lpstrFilter = "JPEG\0*.jpg;*.jpeg\0PNG\0*.png\0WEBP\0*.webp\0TIFF\0*.tiff;*.tif\0AVIF\0*.avif\0BMP\0*.bmp\0DDS\0*.dds\0EXR\0*.exr\0FF\0*.ff\0GIF\0*.gif\0HDR\0*.hdr\0ICO\0*.ico\0PNM\0*.pnm\0QOI\0*.qoi\0TGA\0*.tga\0All Files\0*.*\0\0";
 				of.lpstrFile = path;
 				of.nMaxFile = MAX_PATH;
 				of.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;

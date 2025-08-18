@@ -1,0 +1,6 @@
+CompileFlags: # Tweak the parse settings, example directory given to show format
+  Add:
+    - "-D_WIN32"
+    - "-fdeclspec"
+    - "-I./include"            # e.g `-I/usr/include/SDL2`  suggested from @Palmkeep
+    - "-I/usr/x86_64-w64-mingw32/sys-root/mingw/include"

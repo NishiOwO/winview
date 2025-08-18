@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <wvcommon.h>
 
 static char** path_list = NULL;
@@ -17,7 +18,8 @@ void QueueImage(const char* path, const char* title){
 DriverProc* drivers[] = {
 	TryPNGDriver,
 	TryJPEGDriver,
-	TryTIFFDriver
+	TryTIFFDriver,
+	TryImageRSDriver,
 };
 HWND hImage = NULL;
 int ImageWidth, ImageHeight;
