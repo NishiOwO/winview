@@ -9,7 +9,10 @@
 #define IDM_FILE (1020)
 #define IDM_FILE_QUIT (IDM_FILE + 1)
 
-#define IDM_ABOUT (1030)
+#define IDM_VIEW (1030)
+#define IDM_VIEW_REASPECT (IDM_VIEW + 1)
+
+#define IDM_ABOUT (1090)
 #define IDM_ABOUT_VERSION (IDM_ABOUT + 1)
 
 /* 1100-1199 */

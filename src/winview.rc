@@ -9,6 +9,9 @@ WVMENU MENU {
 	POPUP "&File" {
 		MENUITEM "&Quit", IDM_FILE_QUIT
 	}
+	POPUP "&View" {
+		MENUITEM "&Re-Aspect", IDM_VIEW_REASPECT
+	}
 
 	POPUP "&About", HELP {
 		MENUITEM "&Version", IDM_ABOUT_VERSION

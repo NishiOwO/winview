@@ -30,4 +30,4 @@ winview.exe: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f external/*/src/*.o src/*.o external/*.a *.exe
+	rm -f external/*/src/*.o src/*.o external/*.a *.exe src/*.res

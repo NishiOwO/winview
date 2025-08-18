@@ -23,6 +23,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_COMMAND){
 		int m = LOWORD(wp);
 		if(m == IDM_FILE_QUIT) DestroyWindow(hWnd);
+		if(m == IDM_VIEW_REASPECT){
+			if(hImage != NULL){
+				RECT r;
+				int style;
+				int ww, wh;
+				double scale;
+				GetClientRect(hImage, &r);
+
+				ww = r.right - r.left;
+				wh = r.bottom - r.top;
+
+				if(ww > wh){
+					scale = (double)ww / ImageWidth;
+				}else{
+					scale = (double)wh / ImageHeight;
+				}
+
+				SetRect(&r, 0, 0, ImageWidth * scale, ImageHeight * scale);
+
+				style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
+				AdjustWindowRect(&r, style, FALSE);
+				SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+			}
+		}
 		if(m == IDM_ABOUT_VERSION) DialogBox(hInst, "WVVERSION", hWnd, (DLGPROC)VersionDialog);
 		if(m == IDM_LISTBOX){
 			if(HIWORD(wp) == LBN_DBLCLK){

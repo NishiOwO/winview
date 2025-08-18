@@ -20,12 +20,12 @@ DriverProc* drivers[] = {
 	TryTIFFDriver
 };
 HWND hImage = NULL;
-HANDLE image_thread = NULL;
-HANDLE image_mutex = NULL;
-BOOL image_kill = FALSE;
-HBITMAP image_bmp = NULL;
-RGBQUAD* image_quad;
-int image_width, image_height;
+int ImageWidth, ImageHeight;
+static HANDLE image_thread = NULL;
+static HANDLE image_mutex = NULL;
+static BOOL image_kill = FALSE;
+static HBITMAP image_bmp = NULL;
+static RGBQUAD* image_quad;
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_PAINT){
 		PAINTSTRUCT ps;
@@ -38,7 +38,7 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		}else{
 			HDC hmdc = CreateCompatibleDC(dc);
 			SelectObject(hmdc, image_bmp);
-			StretchBlt(dc, 0, 0, r.right - r.left, r.bottom - r.top, hmdc, 0, 0, image_width, image_height, SRCCOPY);
+			StretchBlt(dc, 0, 0, r.right - r.left, r.bottom - r.top, hmdc, 0, 0, ImageWidth, ImageHeight, SRCCOPY);
 			DeleteDC(hmdc);
 		}
 		EndPaint(hWnd, &ps);
@@ -52,7 +52,7 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		if(image_bmp == NULL){
 			SetRect(&r, 0, 0, 320, 240);
 		}else{
-			SetRect(&r, 0, 0, image_width, image_height);
+			SetRect(&r, 0, 0, ImageWidth, ImageHeight);
 		}
 		style = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
 		AdjustWindowRect(&r, style, FALSE);
@@ -128,8 +128,8 @@ DWORD WINAPI ImageThread(LPVOID param){
 		sprintf(txt, "%dx%d, %s image", img->width, img->height, img->name);
 		SetStatus(txt);
 
-		image_width = img->width;
-		image_height = img->height;
+		ImageWidth = img->width;
+		ImageHeight = img->height;
 
 		img->close(img);
 	}

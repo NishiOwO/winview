@@ -61,6 +61,8 @@ void ReadyStatus(void);
 
 /* image.c */
 extern HWND hImage;
+extern int ImageWidth;
+extern int ImageHeight;
 void QueueImage(const char* path, const char* title);
 void ShowImage(int index);
 void DeleteImage(int index);
