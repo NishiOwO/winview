@@ -57,6 +57,7 @@ void DestroyWinViewMutex(HANDLE mutex);
 void LockWinViewMutex(HANDLE mutex);
 void UnlockWinViewMutex(HANDLE mutex);
 void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
+void ReadyStatus(void);
 
 /* image.c */
 extern HWND hImage;
@@ -64,5 +65,6 @@ void QueueImage(const char* path, const char* title);
 void ShowImage(int index);
 void DeleteImage(int index);
 BOOL InitImageClass(void);
+void DestoryImageThreadIfPresent(void);
 
 #endif

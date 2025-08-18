@@ -121,3 +121,9 @@ void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad){
 	*bmp = CreateDIBSection(dc, (BITMAPINFO*)&bmih, DIB_RGB_COLORS, (void**)quad, NULL, (DWORD)0);
 	ReleaseDC(NULL, dc);
 }
+
+static char txt[256];
+void ReadyStatus(void){
+	sprintf(txt, "Ready - Version %s", wvversion);
+	SetStatus(txt);
+}

@@ -139,7 +139,6 @@ BOOL InitClass(void){
 	return RegisterClassEx(&wc);
 }
 
-static char txt[256];
 BOOL InitWindow(int nCmdShow){
 	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW ^ (WS_MAXIMIZEBOX | WS_THICKFRAME), CW_USEDEFAULT, CW_USEDEFAULT, 440, 440 / 4 * 3, NULL, 0, hInst, NULL);
 	HDC dc;
@@ -160,8 +159,7 @@ BOOL InitWindow(int nCmdShow){
 	SendMessage(hProgress, PBM_SETRANGE, 0, MAKELONG(0, 100));
 	SendMessage(hProgress, PBM_SETPOS, 0, 0);
 
-	sprintf(txt, "Ready - Version %s", wvversion);
-	SetStatus(txt);
+	ReadyStatus();
 
 	hListbox = CreateWindow("LISTBOX", "", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LBS_NOTIFY | LBS_NOINTEGRALHEIGHT, 0, 0, 0, 0, hWnd, (HMENU)IDM_LISTBOX, hInst, NULL);
 

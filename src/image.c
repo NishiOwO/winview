@@ -157,9 +157,22 @@ BOOL InitImageClass(void){
 	return RegisterClassEx(&wc);
 }
 
+void DestoryImageThreadIfPresent(void){
+	if(image_thread != NULL){
+		LockWinViewMutex(image_mutex);
+		image_kill = TRUE;
+		UnlockWinViewMutex(image_mutex);
+		WaitForSingleObject(image_thread, INFINITE);
+		image_kill = FALSE;
+		CloseHandle(image_thread);
+		image_thread = NULL;
+	}
+}
+
 void ShowImage(int index){
 	const char* path = path_list[index];
 	DWORD ident;
+
 	if(hImage == NULL){
 		RECT r;
 
@@ -173,25 +186,23 @@ void ShowImage(int index){
 		SetFocus(hMain);
 	}
 
-	if(image_thread != NULL){
-		LockWinViewMutex(image_mutex);
-		image_kill = TRUE;
-		UnlockWinViewMutex(image_mutex);
-		WaitForSingleObject(image_thread, INFINITE);
-		image_kill = FALSE;
-		CloseHandle(image_thread);
-		image_thread = NULL;
-	}
+	DestoryImageThreadIfPresent();
 	image_thread = CreateThread(NULL, 0, ImageThread, (LPVOID)path, 0, &ident);
 }
 
 void DeleteImage(int index){
 	LRESULT count, cursel;
+
 	SendMessage(hListbox, LB_DELETESTRING, index, 0);
 
-	cursel = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
 	count = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
-	if(cursel == LB_ERR || count > 0){
+	cursel = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
+	if(count == 0){
+		DestoryImageThreadIfPresent();
+		DestroyWindow(hImage);
+		hImage = NULL;
+		ReadyStatus();
+	}else if(cursel == LB_ERR){
 		int ind = index == 0 ? 0 : (index - 1);
 		SendMessage(hListbox, LB_SETCURSEL, ind, 0);
 		ShowImage(ind);
