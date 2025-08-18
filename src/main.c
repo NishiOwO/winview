@@ -176,9 +176,42 @@ BOOL InitWindow(int nCmdShow){
 	return TRUE;
 }
 
+char** ParseArgs(const char* str){
+	char** r = NULL;
+	char p[MAX_PATH + 1];
+	int i;
+	int dq = 0;
+
+	p[0] = 0;
+
+	for(i = 0; str[i] != 0; i++){
+		if(str[i] == '"'){
+			dq = dq == 1 ? 0 : 1;
+		}else if(str[i] == ' ' && !dq){
+			if(strlen(p) > 0){
+				char* p2 = DuplicateString(p);
+				arrput(r, p2);
+			}
+			p[0] = 0;
+		}else{
+			int l = strlen(p);
+			p[l] = str[i];
+			p[l + 1] = 0;
+		}
+	}
+	if(strlen(p) > 0){
+		char* p2 = DuplicateString(p);
+		arrput(r, p2);
+	}
+
+	return r;
+}
+
 int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow){
 	BOOL bret;
 	MSG msg;
+	char** args = ParseArgs(lpsCmdLine);
+	int i;
 
 	hInst = hCurInst;
 	if(!InitClass()){
@@ -196,6 +229,24 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 
 	if(!InitWindow(nCmdShow)){
 		return FALSE;
+	}
+
+	for(i = 0; i < arrlen(args); i++){
+		FILE* f = fopen(args[i], "rb");
+		if(f != NULL){
+			char* name = args[i];
+			int j;
+
+			for(j = strlen(args[i]) - 1; j >= 0; j--){
+				if(args[i][j] == '/' || args[i][j] == '\\'){
+					name = args[i] + j + 1;
+					break;
+				}
+			}
+
+			QueueImage(args[i], name);
+			fclose(f);
+		}
 	}
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
