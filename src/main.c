@@ -139,11 +139,11 @@ BOOL InitClass(void){
 	return RegisterClassEx(&wc);
 }
 
+static char txt[256];
 BOOL InitWindow(int nCmdShow){
 	HWND hWnd = CreateWindow("winview", "WinView", WS_OVERLAPPEDWINDOW ^ (WS_MAXIMIZEBOX | WS_THICKFRAME), CW_USEDEFAULT, CW_USEDEFAULT, 440, 440 / 4 * 3, NULL, 0, hInst, NULL);
 	HDC dc;
 	int parts[2];
-	char txt[256];
 	int i;
 
 	if(hWnd == NULL) return FALSE;
