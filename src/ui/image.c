@@ -93,7 +93,9 @@ DWORD WINAPI ImageThread(LPVOID param){
 	wvimage_t* img = NULL;
 	int i;
 	char* imgpath;
-	
+	RGBQUAD* local_quad;
+	HBITMAP local_bmp;	
+
 	imgpath = DuplicateString(param);
 	SetEvent(image_event);
 
@@ -109,7 +111,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 		SetStatus("Failed to prepare an image");
 		failed = TRUE;
 	}else{
-		CreateWinViewBitmap(img->width, img->height, &image_bmp, &image_quad);
+		CreateWinViewBitmap(img->width, img->height, &local_bmp, &local_quad);
 
 		SetProgress(1);
 		SetStatus("Reading an image");
@@ -128,7 +130,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 			if(data != NULL){
 				int j;
 				for(j = 0; j < img->width; j++){
-					RGBQUAD* q = &image_quad[i * img->width + j];
+					RGBQUAD* q = &local_quad[i * img->width + j];
 					unsigned char* px = &data[j * 4];
 					double op = 1.0 - (double)px[3] / 255;
 					unsigned char c;
@@ -157,6 +159,9 @@ DWORD WINAPI ImageThread(LPVOID param){
 		ImageHeight = img->height;
 
 		img->close(img);
+
+		image_bmp = local_bmp;
+		image_quad = local_quad;
 	}
 	PostMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
 	free(imgpath);
