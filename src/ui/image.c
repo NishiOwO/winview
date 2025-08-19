@@ -29,6 +29,7 @@ static BOOL image_kill = FALSE;
 static HBITMAP image_bmp = NULL;
 static RGBQUAD* image_quad;
 static char ImageStatus[1024];
+static const char* image_name = NULL;
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_PAINT){
 		PAINTSTRUCT ps;
@@ -159,10 +160,14 @@ DWORD WINAPI ImageThread(LPVOID param){
 
 		img->close(img);
 
-		image_bmp = local_bmp;
-		image_quad = local_quad;
+		if(image_name != NULL && strcmp(image_name, imgpath) == 0){
+			image_bmp = local_bmp;
+			image_quad = local_quad;
+		}
 	}
-	PostMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+	if(image_name != NULL && strcmp(image_name, imgpath) == 0){
+		PostMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+	}
 	free(imgpath);
 	return 0;
 }
@@ -221,6 +226,8 @@ void ShowImage(int index){
 
 		existed = FALSE;
 	}
+
+	image_name = path;
 
 	DestoryImageThreadIfPresent();
 
