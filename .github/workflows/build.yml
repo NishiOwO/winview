@@ -2,6 +2,7 @@ name: "Build WinView"
 
 on:
   push:
+  workflow_dispatch:
 
 concurrency:
   group: "build"
