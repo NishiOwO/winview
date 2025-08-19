@@ -88,15 +88,20 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 
 static char txt[256];
 
+static HANDLE image_event;
 DWORD WINAPI ImageThread(LPVOID param){
 	wvimage_t* img = NULL;
 	int i;
+	char* imgpath;
+	
+	imgpath = DuplicateString(param);
+	SetEvent(image_event);
 
 	SetProgress(0);
 	SetStatus("Preparing an image");
 
 	for(i = 0; i < sizeof(drivers) / sizeof(drivers[0]); i++){
-		img = drivers[i](param);
+		img = drivers[i](imgpath);
 		if(img != NULL) break;
 	}
 	
@@ -114,6 +119,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 			if(image_kill){
 				img->close(img);
 				UnlockWinViewMutex(image_mutex);
+				free(imgpath);
 				return 0;
 			}
 			UnlockWinViewMutex(image_mutex);
@@ -153,6 +159,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 		img->close(img);
 	}
 	PostMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+	free(imgpath);
 	return 0;
 }
 
@@ -160,6 +167,7 @@ BOOL InitImageClass(void){
 	WNDCLASSEX wc;
 
 	image_mutex = CreateWinViewMutex();
+	image_event = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -221,6 +229,7 @@ void ShowImage(int index){
 		SendMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
 	}else{
 		image_thread = CreateThread(NULL, 0, ImageThread, (LPVOID)path, 0, &ident);
+		WaitForSingleObject(image_event, INFINITE);
 	}	
 }
 
