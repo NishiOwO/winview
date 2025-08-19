@@ -192,6 +192,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 			px->rgbBlue = row[j * 4 + 2];
 			px->rgbReserved = 0;
 		}
+		free(row);
 	}
 	wvimg->close(wvimg);
 
