@@ -187,9 +187,17 @@ DWORD WINAPI ImageThread(LPVOID param){
 		row = wvimg->read(wvimg);
 		for(j = 0; j < wvimg->width; j++){
 			RGBQUAD* px = &quad[i * wvimg->width + j];
-			px->rgbRed = row[j * 4 + 0];
-			px->rgbGreen = row[j * 4 + 1];
-			px->rgbBlue = row[j * 4 + 2];
+			double s = (double)row[j * 4 + 3] / 255;
+			int c = ((i / 16 + j / 16) % 2) ? 0x80 : 0x60;
+			px->rgbRed = row[j * 4 + 0] * s;
+			px->rgbGreen = row[j * 4 + 1] * s;
+			px->rgbBlue = row[j * 4 + 2] * s;
+
+			s = 1 - s;
+			px->rgbRed += s * c;
+			px->rgbGreen += s * c;
+			px->rgbBlue += s * c;
+
 			px->rgbReserved = 0;
 		}
 		free(row);
