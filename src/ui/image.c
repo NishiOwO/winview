@@ -83,7 +83,22 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		img->thread = NULL;
 
 		LockWinViewMutex(mutex);
-		if(msg == WM_COMPLETED && shown == img){
+		if(msg == WM_COMPLETED && shown == img && img->bitmap == NULL){
+			RECT r;
+			int style;
+
+			ImageWidth = 320;
+			ImageHeight = 240;
+
+			SetRect(&r, 0, 0, img->width, img->height);
+			style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
+			AdjustWindowRect(&r, style, FALSE);
+			SetWindowPos(hWnd, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+
+			AdjustImageWindowSize();
+
+			InvalidateRect(hWnd, NULL, FALSE);
+		}else if(msg == WM_COMPLETED && shown == img){
 			RECT r;
 			int style;
 
@@ -141,7 +156,7 @@ DWORD WINAPI ImageThread(LPVOID param){
 		}
 		UnlockWinViewMutex(mutex);
 
-		PostMessage(hImage, WM_TERMINATE_ME, 0, (LPARAM)image);
+		PostMessage(hImage, WM_COMPLETED, 0, (LPARAM)image);
 		return 0;
 	}
 
