@@ -20,6 +20,7 @@ DriverProc* drivers[] = {
 	TryTIFFDriver
 };
 HWND hImage = NULL;
+BOOL failed = FALSE;
 int ImageWidth, ImageHeight;
 static HANDLE image_thread = NULL;
 static HANDLE image_mutex = NULL;
@@ -33,8 +34,10 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		HDC dc = BeginPaint(hWnd, &ps);
 		GetClientRect(hWnd, &r);
 		SetStretchBltMode(dc, HALFTONE);
-		if(image_bmp == NULL){
+		if(image_bmp == NULL && failed){
 			ShowBitmapSize(dc, "WVFAILED", 0, 0, r.right - r.left, r.bottom - r.top);
+		}else if(image_bmp == NULL){
+			FillRect(dc, &r, GetSysColorBrush(COLOR_MENU));
 		}else{
 			HDC hmdc = CreateCompatibleDC(dc);
 			SelectObject(hmdc, image_bmp);
@@ -77,14 +80,10 @@ DWORD WINAPI ImageThread(LPVOID param){
 		img = drivers[i](param);
 		if(img != NULL) break;
 	}
-
-	if(image_bmp != NULL){
-		DeleteObject(image_bmp);
-	}
-	image_bmp = NULL;
-	image_quad = NULL;
+	
 	if(img == NULL){
 		SetStatus("Failed to prepare an image");
+		failed = TRUE;
 	}else{
 		CreateWinViewBitmap(img->width, img->height, &image_bmp, &image_quad);
 
@@ -173,6 +172,7 @@ void DestoryImageThreadIfPresent(void){
 void ShowImage(int index){
 	const char* path = path_list[index];
 	DWORD ident;
+	BOOL existed = TRUE;
 
 	if(hImage == NULL){
 		RECT r;
@@ -185,9 +185,20 @@ void ShowImage(int index){
 		UpdateWindow(hImage);
 
 		SetFocus(hMain);
+
+		existed = FALSE;
 	}
 
 	DestoryImageThreadIfPresent();
+
+	if(image_bmp != NULL){
+		DeleteObject(image_bmp);
+	}
+	image_bmp = NULL;
+	image_quad = NULL;
+	failed = FALSE;
+	if(existed) SendMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+
 	image_thread = CreateThread(NULL, 0, ImageThread, (LPVOID)path, 0, &ident);
 }
 

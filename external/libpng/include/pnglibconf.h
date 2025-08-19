@@ -203,7 +203,7 @@
 #define PNG_zTXt_SUPPORTED
 /* end of options */
 /* settings */
-#define PNG_API_RULE 0
+#define PNG_API_RULE 2
 #define PNG_DEFAULT_READ_MACROS 1
 #define PNG_GAMMA_THRESHOLD_FIXED 5000
 #define PNG_IDAT_READ_SIZE PNG_ZBUF_SIZE
