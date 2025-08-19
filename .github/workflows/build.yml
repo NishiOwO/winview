@@ -9,8 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-win32:
-    name: "Build for Windows 32-bit"
+  build-win32-watcom:
+    name: "Build for Windows 32-bit (Watcom)"
     runs-on: ubuntu-latest
 
     permissions:
@@ -29,12 +29,34 @@ jobs:
     - name: Build
       run: make -j4 OPTMK=watcom
     - name: Rename
-      run: mv winview.exe winview32.exe
+      run: mv winview.exe winview32-watcom.exe
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: build-win32
-        path: winview32.exe
+        name: build-win32-watcom
+        path: winview32-watcom.exe
+
+  build-win32-mingw:
+    name: "Build for Windows 32-bit (MinGW)"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install packages
+      run: sudo apt-get install mingw-w64
+    - name: Build
+      run: make -j4 TARGET=i686-w64-mingw32-
+    - name: Rename
+      run: mv winview.exe winview32-mingw.exe
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-win32-mingw
+        path: winview32-mingw.exe
 
   build-win64:
     name: "Build for Windows 64-bit"
@@ -65,15 +87,19 @@ jobs:
     permissions:
       contents: write
 
-    needs: [build-win32, build-win64]
+    needs: [build-win32-watcom, build-win32-mingw, build-win64]
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Download from build-win32
+    - name: Download from build-win32-watcom
       uses: actions/download-artifact@v4
       with:
-        name: build-win32
+        name: build-win32-watcom
+    - name: Download from build-win32-mingw
+      uses: actions/download-artifact@v4
+      with:
+        name: build-win32-mingw
     - name: Download from build-win64
       uses: actions/download-artifact@v4
       with:
