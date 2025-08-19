@@ -44,7 +44,8 @@ void QueueImage(const char* path, const char* title){
 DriverProc* drivers[] = {
 	TryPNGDriver,
 	TryJPEGDriver,
-	TryTIFFDriver
+	TryTIFFDriver,
+	TryXPMDriver
 };
 
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
@@ -187,11 +188,20 @@ DWORD WINAPI ImageThread(LPVOID param){
 		row = wvimg->read(wvimg);
 		for(j = 0; j < wvimg->width; j++){
 			RGBQUAD* px = &quad[i * wvimg->width + j];
-			double s = (double)row[j * 4 + 3] / 255;
+			double s;
 			int c = ((i / 16 + j / 16) % 2) ? 0x80 : 0x60;
-			px->rgbRed = row[j * 4 + 0] * s;
-			px->rgbGreen = row[j * 4 + 1] * s;
-			px->rgbBlue = row[j * 4 + 2] * s;
+
+			if(row == NULL){
+				s = 0;
+				px->rgbRed = 0;
+				px->rgbGreen = 0;
+				px->rgbBlue = 0;
+			}else{
+				s = (double)row[j * 4 + 3] / 255;
+				px->rgbRed = row[j * 4 + 0] * s;
+				px->rgbGreen = row[j * 4 + 1] * s;
+				px->rgbBlue = row[j * 4 + 2] * s;
+			}
 
 			s = 1 - s;
 			px->rgbRed += s * c;
