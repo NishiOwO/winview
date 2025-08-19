@@ -64,10 +64,6 @@ void UnlockWinViewMutex(HANDLE mutex);
 void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
 void ReadyStatus(void);
 void AdjustImageWindowSize(void);
-HBITMAP GetDIBCache(const char* path, int* width, int* height, char* status);
-void InitDIBCache(void);
-void SaveDIBCache(const char* path, HBITMAP bmp, int width, int height, char* status);
-void DestroyDIBCache(const char* path);
 
 /* image.c */
 extern HWND hImage;

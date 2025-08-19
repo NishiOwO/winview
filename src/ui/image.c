@@ -87,8 +87,6 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 			RECT r;
 			int style;
 
-			SaveDIBCache(img->path, img->bitmap, img->width, img->height, img->status);
-
 			ImageWidth = img->width;
 			ImageHeight = img->height;
 
@@ -196,8 +194,6 @@ DWORD WINAPI ImageThread(LPVOID param){
 BOOL InitImageClass(void){
 	WNDCLASSEX wc;
 
-	InitDIBCache();
-
 	mutex = CreateWinViewMutex();
 
 	wc.cbSize = sizeof(wc);
@@ -236,7 +232,7 @@ void ShowImage(int index){
 	shown = image;
 	UnlockWinViewMutex(mutex);
 
-	if(GetDIBCache(image->path, &ImageWidth, &ImageHeight, Status) == NULL){
+	if(image->bitmap == NULL){
 		if(image->thread == NULL){
 			DWORD id;
 			image->thread = CreateThread(NULL, 0, ImageThread, image, 0, &id);
@@ -247,6 +243,9 @@ void ShowImage(int index){
 	}else{
 		RECT r;
 		int style;
+
+		ImageWidth = image->width;
+		ImageHeight = image->height;
 
 		SetRect(&r, 0, 0, ImageWidth, ImageHeight);
 		style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
@@ -269,11 +268,13 @@ void DeleteImage(int index){
 		WaitForSingleObject(images[index]->thread, INFINITE);
 		CloseHandle(images[index]->thread);
 		images[index]->thread = NULL;
+		CloseHandle(images[index]->wakeup_event);
+		CloseHandle(images[index]->ack_event);
+		free(images[index]->path);
 	}
+	if(images[index]->bitmap != NULL) DeleteObject(images[index]->bitmap);
 
 	SendMessage(hListbox, LB_DELETESTRING, index, 0);
-
-	DestroyDIBCache(images[index]->path);
 	arrdel(images, index);
 
 	count = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
