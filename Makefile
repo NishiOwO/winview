@@ -9,7 +9,7 @@ LIBS = -lgdi32 -lcomctl32 -lcomdlg32
 
 -include mk/$(OPTMK).mk
 
-.PHONY: all clean
+.PHONY: all clean get-version
 .SUFFIXES: .c .o .rc .res
 
 all: winview.exe
@@ -28,6 +28,9 @@ winview.exe: $(OBJS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+get-version:
+	@grep wvversion src/version.c | head -n1 | grep -Eo '".+"' | xargs echo
 
 clean:
 	rm -f external/*/src/*.o src/*.o external/*.a *.exe src/*.res
