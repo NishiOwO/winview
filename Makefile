@@ -14,8 +14,9 @@ LIBS = -lgdi32 -lcomctl32 -lcomdlg32
 
 all: winview.exe
 
-OBJS += src/ds.o src/main.o src/version.o src/util.o src/image.o src/credits.o
-OBJS += src/tiff.o src/png.o src/jpeg.o
+OBJS += src/ds.o src/util.o
+OBJS += src/ui/main.o src/ui/version.o src/ui/image.o src/ui/credits.o
+OBJS += src/format/tiff.o src/format/png.o src/format/jpeg.o
 OBJS += src/winview.res
 include deps.mk
 
@@ -30,7 +31,7 @@ winview.exe: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 get-version:
-	@grep wvversion src/version.c | head -n1 | grep -Eo '".+"' | xargs echo
+	@grep wvversion src/ui/version.c | head -n1 | grep -Eo '".+"' | xargs echo
 
 clean:
-	rm -f external/*/src/*.o src/*.o external/*.a *.exe src/*.res
+	rm -f external/*/src/*.o src/*.o src/*/*.o external/*.a *.exe src/*.res
