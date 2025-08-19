@@ -44,6 +44,9 @@ extern HWND hMain, hStatus, hProgress, hListbox;
 extern const char* wvversion;
 LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
+/* credits.c */
+LRESULT CALLBACK CreditsDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+
 /* util.c */
 HBRUSH GetSolidBrushCached(int r, int g, int b);
 HBRUSH GetHatchBrushCached(int r, int g, int b);

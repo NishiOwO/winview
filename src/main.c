@@ -55,6 +55,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 				SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
 			}
 		}
+		if(m == IDM_ABOUT_CREDITS) DialogBox(hInst, "WVCREDITS", hWnd, (DLGPROC)CreditsDialog);
 		if(m == IDM_ABOUT_VERSION) DialogBox(hInst, "WVVERSION", hWnd, (DLGPROC)VersionDialog);
 		if(m == IDM_LISTBOX){
 			if(HIWORD(wp) == LBN_DBLCLK){
@@ -197,7 +198,7 @@ BOOL InitWindow(int nCmdShow){
 
 	for(i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++){
 		buttons[i].menu = (HMENU)(ULONG_PTR)(IDM_BUTTONS + i);
-		buttons[i].wnd = CreateWindow("Button", buttons[i].text, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 0, 0, hWnd, buttons[i].menu, hInst, NULL);
+		buttons[i].wnd = CreateWindow("BUTTON", buttons[i].text, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 0, 0, hWnd, buttons[i].menu, hInst, NULL);
 	}
 
 	ShowWindow(hWnd, nCmdShow);
@@ -307,6 +308,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			fclose(f);
 		}
 	}
+
+	DialogBox(hInst, "WVCREDITS", hMain, (DLGPROC)CreditsDialog);
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
 		if(bret == -1) break;
