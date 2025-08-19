@@ -58,6 +58,7 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 
 		GetClientRect(hWnd, &r);
 
+		LockWinViewMutex(mutex);
 		if(shown == NULL || (shown->thread != NULL && shown->bitmap != NULL)){
 			FillRect(hdc, &r, GetSysColorBrush(COLOR_MENU));
 		}else if(shown->thread == NULL && shown->bitmap == NULL){
@@ -71,6 +72,8 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 			StretchBlt(hdc, 0, 0, r.right - r.left, r.bottom - r.top, hmdc, 0, 0, ImageWidth, ImageHeight, SRCCOPY);
 			DeleteObject(hmdc);
 		}
+		UnlockWinViewMutex(mutex);
+
 		EndPaint(hWnd, &ps);
 	}else if(msg == WM_TERMINATE_ME || msg == WM_COMPLETED){
 		image_t* img = (image_t*)lp;
@@ -79,7 +82,8 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		CloseHandle(img->thread);
 		img->thread = NULL;
 
-		if(msg == WM_COMPLETED){
+		LockWinViewMutex(mutex);
+		if(msg == WM_COMPLETED && shown == img){
 			RECT r;
 			int style;
 
@@ -96,7 +100,13 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 			AdjustImageWindowSize();
 
 			InvalidateRect(hWnd, NULL, FALSE);
+
+			SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)img->status);
 		}
+		UnlockWinViewMutex(mutex);
+	}else if(msg == WM_GETMINMAXINFO){
+		LPMINMAXINFO mmi = (LPMINMAXINFO)lp;
+		mmi->ptMinTrackSize.x= 200;
 	}else if(msg == WM_ERASEBKGND){
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
@@ -137,6 +147,8 @@ DWORD WINAPI ImageThread(LPVOID param){
 		return 0;
 	}
 
+	sprintf(image->status, "%dx%d, %s image", wvimg->width, wvimg->height, wvimg->name);
+
 	image->width = wvimg->width;
 	image->height = wvimg->height;
 	CreateWinViewBitmap(wvimg->width, wvimg->height, &bmp, &quad);
@@ -152,6 +164,12 @@ DWORD WINAPI ImageThread(LPVOID param){
 		if(image->go_terminate){
 			break;
 		}
+
+		LockWinViewMutex(mutex);
+		if(shown == image){
+			SetProgress((double)i / wvimg->height * 100);
+		}
+		UnlockWinViewMutex(mutex);
 
 		row = wvimg->read(wvimg);
 		for(j = 0; j < wvimg->width; j++){
@@ -238,8 +256,35 @@ void ShowImage(int index){
 		AdjustImageWindowSize();
 
 		InvalidateRect(hImage, NULL, FALSE);
+
+		SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)shown->status);
 	}
 }
 
 void DeleteImage(int index){
+	LRESULT count, cursel;
+
+	if(images[index]->thread != NULL){
+		images[index]->go_terminate = TRUE;
+		WaitForSingleObject(images[index]->thread, INFINITE);
+		CloseHandle(images[index]->thread);
+		images[index]->thread = NULL;
+	}
+
+	SendMessage(hListbox, LB_DELETESTRING, index, 0);
+
+	DestroyDIBCache(images[index]->path);
+	arrdel(images, index);
+
+	count = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
+	cursel = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
+	if(count == 0){
+		DestroyWindow(hImage);
+		hImage = NULL;
+		ReadyStatus();
+	}else if(cursel == LB_ERR){
+		int ind = index == 0 ? 0 : (index - 1);
+		SendMessage(hListbox, LB_SETCURSEL, ind, 0);
+		ShowImage(ind);
+	}
 }
