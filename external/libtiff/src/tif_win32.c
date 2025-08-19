@@ -149,11 +149,22 @@ static uint64_t _tiffSeekProc(thandle_t fd, uint64_t off, int whence)
 
 static int _tiffCloseProc(thandle_t fd) { return (CloseHandle(fd) ? 0 : -1); }
 
+typedef BOOL(WINAPI *PFNGETFILESIZEEXPROC)(HANDLE hFile, PLARGE_INTEGER lpFileSize);
+static PFNGETFILESIZEEXPROC GetFileSizeExProc = NULL;
+
 static uint64_t _tiffSizeProc(thandle_t fd)
 {
     LARGE_INTEGER m;
-    if (GetFileSizeEx(fd, &m))
+    DWORD m2;
+    if(GetFileSizeExProc == NULL){
+	GetFileSizeExProc = (PFNGETFILESIZEEXPROC)GetProcAddress(LoadLibrary("kernel32.dll"), "GetFileSizeEx");
+	if(GetFileSizeExProc == NULL) GetFileSizeExProc = (void*)1;
+    }
+
+    if (GetFileSizeExProc != (void*)1 && GetFileSizeExProc(fd, &m))
         return (m.QuadPart);
+    else if (GetFileSize(fd, &m2))
+        return (m2);
     else
         return (0);
 }
