@@ -19,7 +19,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install Watcom
-      run: mkdir -p /usr/watcom && curl -L https://github.com/open-watcom/open-watcom-v2/releases/download/Last-CI-build/ow-snapshot.tar.xz | tar xJvf - -C /usr/watcom
+      run: sudo mkdir -p /usr/watcom && curl -L https://github.com/open-watcom/open-watcom-v2/releases/download/Last-CI-build/ow-snapshot.tar.xz | sudo tar xJvf - -C /usr/watcom
     - name: Set variables
       run: |
         echo "WATCOM=/usr/watcom" >> $GITHUB_ENV

@@ -15,6 +15,14 @@ button_t buttons[] = {
 	{"&Delete", 'D', 0, NULL}
 };
 
+const char* exts[] = {
+	"JPEG", "*.jpg;*.jpeg",
+	"PNG", "*.png",
+	"TIFF", "*.tiff;*.tif"
+};
+char exttext[1024];
+int extseek = 0;
+
 HWND hMain, hStatus, hProgress, hListbox;
 HINSTANCE hInst;
 HFONT fixedsys, bifixedsys;
@@ -66,7 +74,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 
 				of.lStructSize = sizeof(of);
 				of.hwndOwner = hWnd;
-				of.lpstrFilter = "JPEG\0*.jpg;*.jpeg\0PNG\0*.png\0TIFF\0*.tiff;*.tif\0All Files\0*.*\0\0";
+				of.lpstrFilter = exttext;
 				of.lpstrFile = path;
 				of.nMaxFile = MAX_PATH;
 				of.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -229,11 +237,40 @@ char** ParseArgs(const char* str){
 	return r;
 }
 
+void AddEntry(const char* str){
+	strcpy(exttext + extseek, str);
+	extseek += strlen(str) + 1;
+}
+
 int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow){
 	BOOL bret;
 	MSG msg;
 	char** args = ParseArgs(lpsCmdLine);
 	int i;
+	char allsupport[1024];
+
+	allsupport[0] = 0;
+
+	memset(exttext, 0, sizeof(exttext));
+	for(i = 0; i < sizeof(exts) / sizeof(exts[0]); i += 2){
+		if(strlen(allsupport) == 0){
+			strcpy(allsupport, exts[i + 1]);
+		}else{
+			strcat(allsupport, ";");
+			strcat(allsupport, exts[i + 1]);
+		}
+	}
+
+	AddEntry("All Supported Formats");
+	AddEntry(allsupport);
+
+	for(i = 0; i < sizeof(exts) / sizeof(exts[0]); i += 2){
+		AddEntry(exts[i]);
+		AddEntry(exts[i + 1]);
+	}
+
+	AddEntry("All files");
+	AddEntry("*.*");
 
 	hInst = hCurInst;
 	if(!InitClass()){
