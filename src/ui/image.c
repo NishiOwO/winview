@@ -1,6 +1,7 @@
 #include <wvcommon.h>
 
 static char** path_list = NULL;
+const char* reading_path = NULL;
 
 void QueueImage(const char* path, const char* title){
 	LRESULT count = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
@@ -27,6 +28,7 @@ static HANDLE image_mutex = NULL;
 static BOOL image_kill = FALSE;
 static HBITMAP image_bmp = NULL;
 static RGBQUAD* image_quad;
+static char ImageStatus[1024];
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	if(msg == WM_PAINT){
 		PAINTSTRUCT ps;
@@ -63,6 +65,8 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 			ImageHeight = 240;
 		}else if(image_bmp == NULL){
 			return 0;
+		}else if(GetDIBCache(reading_path, &ImageWidth, &ImageHeight, ImageStatus) == NULL){
+			SaveDIBCache(reading_path, image_bmp, ImageWidth, ImageHeight, ImageStatus);
 		}
 
 		r.left = 0;
@@ -74,6 +78,8 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
 
 		AdjustImageWindowSize();
+
+		SetStatus(ImageStatus);
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
 	}
@@ -139,8 +145,8 @@ DWORD WINAPI ImageThread(LPVOID param){
 		SetProgress(100);
 
 		sprintf(txt, "%dx%d, %s image", img->width, img->height, img->name);
-		SetStatus(txt);
 
+		strcpy(ImageStatus, txt);
 		ImageWidth = img->width;
 		ImageHeight = img->height;
 
@@ -187,6 +193,8 @@ void ShowImage(int index){
 	DWORD ident;
 	BOOL existed = TRUE;
 
+	reading_path = path;
+
 	if(hImage == NULL){
 		RECT r;
 
@@ -204,15 +212,16 @@ void ShowImage(int index){
 
 	DestoryImageThreadIfPresent();
 
-	if(image_bmp != NULL){
-		DeleteObject(image_bmp);
-	}
 	image_bmp = NULL;
 	image_quad = NULL;
 	failed = FALSE;
 	if(existed) SendMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
 
-	image_thread = CreateThread(NULL, 0, ImageThread, (LPVOID)path, 0, &ident);
+	if((image_bmp = GetDIBCache(path, &ImageWidth, &ImageHeight, ImageStatus)) != NULL){
+		SendMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+	}else{
+		image_thread = CreateThread(NULL, 0, ImageThread, (LPVOID)path, 0, &ident);
+	}	
 }
 
 void DeleteImage(int index){
@@ -233,6 +242,7 @@ void DeleteImage(int index){
 		ShowImage(ind);
 	}
 
+	DestroyDIBCache(path_list[index]);
 	free(path_list[index]);
 	arrdel(path_list, index);
 }

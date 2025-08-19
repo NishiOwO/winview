@@ -7,6 +7,14 @@ typedef struct brushcache {
 	HBRUSH brush;
 } brushcache_t;
 
+typedef struct dibcache {
+	char* key;
+	HBITMAP value;
+	int width;
+	int height;
+	char* status;
+} dibcache_t;
+
 void ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h) {
 	HBITMAP hBitmap = LoadBitmap(hInst, name);
 	BITMAP bmp;
@@ -179,4 +187,45 @@ readjust:
 	}
 
 	SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+}
+
+static dibcache_t* dibcache = NULL;
+HBITMAP GetDIBCache(const char* path, int* width, int* height, char* status){
+	dibcache_t c;
+	if(shgeti(dibcache, path) == -1) return NULL;
+	c = shgets(dibcache, path);
+
+	*width = c.width;
+	*height = c.height;
+	strcpy(status, c.status);
+
+	return c.value;
+}
+
+void InitDIBCache(void){
+	sh_new_strdup(dibcache);
+	shdefault(dibcache, NULL);
+}
+
+void SaveDIBCache(const char* path, HBITMAP bmp, int width, int height, char* status){
+	dibcache_t c;
+
+	c.key = (char*)path;
+	c.value = bmp;
+	c.width = width;
+	c.height = height;
+	c.status = DuplicateString(status);
+
+	shputs(dibcache, c);
+}
+
+void DestroyDIBCache(const char* path){
+	dibcache_t c;
+	if(shgeti(dibcache, path) == -1) return;
+	c = shgets(dibcache, path);
+
+	DeleteObject(c.value);
+	free(c.status);
+
+	shdel(dibcache, path);
 }
