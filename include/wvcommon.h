@@ -61,6 +61,7 @@ void LockWinViewMutex(HANDLE mutex);
 void UnlockWinViewMutex(HANDLE mutex);
 void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
 void ReadyStatus(void);
+void AdjustImageWindowSize(void);
 
 /* image.c */
 extern HWND hImage;

@@ -33,26 +33,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		if(m == IDM_FILE_QUIT) DestroyWindow(hWnd);
 		if(m == IDM_VIEW_REASPECT){
 			if(hImage != NULL){
-				RECT r;
-				int style;
-				int ww, wh;
-				double scale;
-				GetClientRect(hImage, &r);
-
-				ww = r.right - r.left;
-				wh = r.bottom - r.top;
-
-				if(ww > wh){
-					scale = (double)ww / ImageWidth;
-				}else{
-					scale = (double)wh / ImageHeight;
-				}
-
-				SetRect(&r, 0, 0, ImageWidth * scale, ImageHeight * scale);
-
-				style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
-				AdjustWindowRect(&r, style, FALSE);
-				SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+				AdjustImageWindowSize();
 			}
 		}
 		if(m == IDM_ABOUT_CREDITS) DialogBox(hInst, "WVCREDITS", hWnd, (DLGPROC)CreditsDialog);
@@ -91,7 +72,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 				if(s != LB_ERR) DeleteImage(s);
 			}else if(id == 'P'){
 				LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
-				if(s == LB_ERR){
+				LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
+				if(c <= 0){
+				}else if(s == LB_ERR){
 					SendMessage(hListbox, LB_SETCURSEL, 0, 0);
 					ShowImage(0);
 				}else if(s > 0){
@@ -101,7 +84,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 			}else if(id == 'N'){
 				LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
 				LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
-				if(s == LB_ERR){
+				if(c <= 0){
+				}else if(s == LB_ERR){
 					SendMessage(hListbox, LB_SETCURSEL, c - 1, 0);
 					ShowImage(0);
 				}else if(s < (c - 1)){

@@ -48,21 +48,32 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 	}else if(msg == WM_CLOSE){
 		hImage = NULL;
 		DestroyWindow(hWnd);
+	}else if(msg == WM_GETMINMAXINFO){
+		LPMINMAXINFO mmi = (LPMINMAXINFO)lp;
+		mmi->ptMinTrackSize.x = 300;
+		mmi->ptMinTrackSize.y = 300;
 	}else if(msg == WM_ERASEBKGND){
 	}else if(msg == WM_FINISHED_IMAGE){
 		RECT r;
 		int style;
+
 		InvalidateRect(hWnd, 0, TRUE);
 		if(image_bmp == NULL && failed){
-			SetRect(&r, 0, 0, 320, 240);
-		}else if(image_bmp != NULL){
-			SetRect(&r, 0, 0, ImageWidth, ImageHeight);
-		}else{
+			ImageWidth = 320;
+			ImageHeight = 240;
+		}else if(image_bmp == NULL){
 			return 0;
 		}
-		style = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
+
+		r.left = 0;
+		r.top = 0;
+		r.right = ImageWidth;
+		r.bottom = ImageHeight;
+		style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
 		AdjustWindowRect(&r, style, FALSE);
-		SetWindowPos(hWnd, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+		SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+
+		AdjustImageWindowSize();
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
 	}
