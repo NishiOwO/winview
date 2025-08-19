@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+#include <sys/stat.h>
 
 enum WM_USERS {
 	WM_FINISHED_IMAGE = WM_USER,

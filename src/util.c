@@ -13,6 +13,7 @@ typedef struct dibcache {
 	int width;
 	int height;
 	char* status;
+	time_t mtime;
 } dibcache_t;
 
 void ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h) {
@@ -192,8 +193,18 @@ readjust:
 static dibcache_t* dibcache = NULL;
 HBITMAP GetDIBCache(const char* path, int* width, int* height, char* status){
 	dibcache_t c;
+	struct _stat s;
 	if(shgeti(dibcache, path) == -1) return NULL;
+	if(_stat(path, &s) != 0){
+		DestroyDIBCache(path);
+		return NULL;
+	}
+
 	c = shgets(dibcache, path);
+	if(c.mtime != s.st_mtime){
+		DestroyDIBCache(path);
+		return NULL;
+	}
 
 	*width = c.width;
 	*height = c.height;
@@ -209,12 +220,16 @@ void InitDIBCache(void){
 
 void SaveDIBCache(const char* path, HBITMAP bmp, int width, int height, char* status){
 	dibcache_t c;
+	struct _stat s;
+
+	_stat(path, &s);
 
 	c.key = (char*)path;
 	c.value = bmp;
 	c.width = width;
 	c.height = height;
 	c.status = DuplicateString(status);
+	c.mtime = s.st_mtime;
 
 	shputs(dibcache, c);
 }
