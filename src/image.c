@@ -53,10 +53,12 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		RECT r;
 		int style;
 		InvalidateRect(hWnd, 0, TRUE);
-		if(image_bmp == NULL){
+		if(image_bmp == NULL && failed){
 			SetRect(&r, 0, 0, 320, 240);
-		}else{
+		}else if(image_bmp != NULL){
 			SetRect(&r, 0, 0, ImageWidth, ImageHeight);
+		}else{
+			return 0;
 		}
 		style = (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE);
 		AdjustWindowRect(&r, style, FALSE);

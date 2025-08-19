@@ -27,4 +27,5 @@ sub scan_proj {
 scan_proj("libpng");
 scan_proj("libtiff");
 scan_proj("libjpeg");
+scan_proj("libgif");
 scan_proj("libz");
