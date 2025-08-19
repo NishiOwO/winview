@@ -309,8 +309,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		}
 	}
 
-	DialogBox(hInst, "WVCREDITS", hMain, (DLGPROC)CreditsDialog);
-
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0){
 		if(bret == -1) break;
 		TranslateMessage(&msg);
