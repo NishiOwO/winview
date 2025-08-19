@@ -52,8 +52,7 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		DestroyWindow(hWnd);
 	}else if(msg == WM_GETMINMAXINFO){
 		LPMINMAXINFO mmi = (LPMINMAXINFO)lp;
-		mmi->ptMinTrackSize.x = 50;
-		mmi->ptMinTrackSize.y = 50;
+		mmi->ptMinTrackSize.x = 200;
 	}else if(msg == WM_ERASEBKGND){
 	}else if(msg == WM_FINISHED_IMAGE){
 		RECT r;
