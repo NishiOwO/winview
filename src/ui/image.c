@@ -1,15 +1,41 @@
 #include <wvcommon.h>
 
-static char** path_list = NULL;
-const char* reading_path = NULL;
+typedef struct image {
+	char* path;
+	HANDLE thread;
+	HANDLE wakeup_event;
+	HANDLE ack_event;
+	BOOL go_sleep;
+	BOOL go_terminate;
+	HBITMAP bitmap;
+	int width;
+	int height;
+	char status[1024];
+} image_t;
+
+int ImageWidth, ImageHeight;
+HWND hImage = NULL;
+static image_t* shown = NULL;
+static image_t** images = NULL;
+static HANDLE mutex = NULL;
 
 void QueueImage(const char* path, const char* title){
-	LRESULT count = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
-	char* s = DuplicateString(path);
+	image_t* image;
+
+	Allocate(image);
+
+	image->path = DuplicateString(path);
+	image->thread = NULL;
+	image->wakeup_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+	image->ack_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+	image->go_sleep = FALSE;
+	image->go_terminate = FALSE;
+
+	arrput(images, image);
+
 	SendMessage(hListbox, LB_ADDSTRING, 0, (LPARAM)title);
 
-	arrput(path_list, s);
-	if(count == 0){
+	if(arrlen(images) == 1){
 		SendMessage(hListbox, LB_SETCURSEL, 0, 0);
 		ShowImage(0);
 	}
@@ -20,66 +46,58 @@ DriverProc* drivers[] = {
 	TryJPEGDriver,
 	TryTIFFDriver
 };
-HWND hImage = NULL;
-BOOL failed = FALSE;
-int ImageWidth, ImageHeight;
-static HANDLE image_thread = NULL;
-static HANDLE image_mutex = NULL;
-static BOOL image_kill = FALSE;
-static HBITMAP image_bmp = NULL;
-static RGBQUAD* image_quad;
-static char ImageStatus[1024];
-static const char* image_name = NULL;
+
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
-	if(msg == WM_PAINT){
-		PAINTSTRUCT ps;
-		RECT r;
-		HDC dc = BeginPaint(hWnd, &ps);
-		GetClientRect(hWnd, &r);
-		SetStretchBltMode(dc, HALFTONE);
-		if(image_bmp == NULL && failed){
-			ShowBitmapSize(dc, "WVFAILED", 0, 0, r.right - r.left, r.bottom - r.top);
-		}else if(image_bmp == NULL){
-			FillRect(dc, &r, GetSysColorBrush(COLOR_MENU));
-		}else{
-			HDC hmdc = CreateCompatibleDC(dc);
-			SelectObject(hmdc, image_bmp);
-			StretchBlt(dc, 0, 0, r.right - r.left, r.bottom - r.top, hmdc, 0, 0, ImageWidth, ImageHeight, SRCCOPY);
-			DeleteDC(hmdc);
-		}
-		EndPaint(hWnd, &ps);
-	}else if(msg == WM_CLOSE){
+	if(msg == WM_CLOSE){
 		hImage = NULL;
 		DestroyWindow(hWnd);
-	}else if(msg == WM_GETMINMAXINFO){
-		LPMINMAXINFO mmi = (LPMINMAXINFO)lp;
-		mmi->ptMinTrackSize.x = 200;
-	}else if(msg == WM_ERASEBKGND){
-	}else if(msg == WM_FINISHED_IMAGE){
+	}else if(msg == WM_PAINT){
+		PAINTSTRUCT ps;
 		RECT r;
-		int style;
+		HDC hdc = BeginPaint(hWnd, &ps);
 
-		InvalidateRect(hWnd, 0, TRUE);
-		if(image_bmp == NULL && failed){
-			ImageWidth = 320;
-			ImageHeight = 240;
-		}else if(image_bmp == NULL){
-			return 0;
-		}else if(GetDIBCache(reading_path, &ImageWidth, &ImageHeight, ImageStatus) == NULL){
-			SaveDIBCache(reading_path, image_bmp, ImageWidth, ImageHeight, ImageStatus);
+		GetClientRect(hWnd, &r);
+
+		if(shown == NULL || (shown->thread != NULL && shown->bitmap != NULL)){
+			FillRect(hdc, &r, GetSysColorBrush(COLOR_MENU));
+		}else if(shown->thread == NULL && shown->bitmap == NULL){
+			ShowBitmapSize(hdc, "WVFAILED", 0, 0, r.right - r.left, r.bottom - r.top);
+		}else if(shown->bitmap != NULL){
+			HDC hmdc = CreateCompatibleDC(hdc);
+
+			SetStretchBltMode(hdc, HALFTONE);
+
+			SelectObject(hmdc, shown->bitmap);
+			StretchBlt(hdc, 0, 0, r.right - r.left, r.bottom - r.top, hmdc, 0, 0, ImageWidth, ImageHeight, SRCCOPY);
+			DeleteObject(hmdc);
 		}
+		EndPaint(hWnd, &ps);
+	}else if(msg == WM_TERMINATE_ME || msg == WM_COMPLETED){
+		image_t* img = (image_t*)lp;
 
-		r.left = 0;
-		r.top = 0;
-		r.right = ImageWidth;
-		r.bottom = ImageHeight;
-		style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
-		AdjustWindowRect(&r, style, FALSE);
-		SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+		WaitForSingleObject(img->thread, INFINITE);
+		CloseHandle(img->thread);
+		img->thread = NULL;
 
-		AdjustImageWindowSize();
+		if(msg == WM_COMPLETED){
+			RECT r;
+			int style;
 
-		SetStatus(ImageStatus);
+			SaveDIBCache(img->path, img->bitmap, img->width, img->height, img->status);
+
+			ImageWidth = img->width;
+			ImageHeight = img->height;
+
+			SetRect(&r, 0, 0, img->width, img->height);
+			style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
+			AdjustWindowRect(&r, style, FALSE);
+			SetWindowPos(hWnd, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+
+			AdjustImageWindowSize();
+
+			InvalidateRect(hWnd, NULL, FALSE);
+		}
+	}else if(msg == WM_ERASEBKGND){
 	}else{
 		return DefWindowProc(hWnd, msg, wp, lp);
 	}
@@ -87,96 +105,82 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 }
 
 static char txt[256];
-
-static HANDLE image_event;
 DWORD WINAPI ImageThread(LPVOID param){
-	wvimage_t* img = NULL;
+	image_t* image = (image_t*)param;
 	int i;
-	char* imgpath;
-	RGBQUAD* local_quad;
-	HBITMAP local_bmp;	
+	wvimage_t* wvimg;
+	HBITMAP bmp;
+	RGBQUAD* quad;
 
-	imgpath = DuplicateString(param);
-	SetEvent(image_event);
+	SetEvent(image->ack_event);
 
-	SetProgress(0);
-	SetStatus("Preparing an image");
+	LockWinViewMutex(mutex);
+	if(shown == image){
+		SetStatus("Reading image");
+	}
+	UnlockWinViewMutex(mutex);
 
 	for(i = 0; i < sizeof(drivers) / sizeof(drivers[0]); i++){
-		img = drivers[i](imgpath);
-		if(img != NULL) break;
+		wvimg = drivers[i](image->path);
+
+		if(wvimg != NULL) break;
 	}
-	
-	if(img == NULL){
-		SetStatus("Failed to prepare an image");
-		failed = TRUE;
+
+	if(wvimg == NULL){
+		LockWinViewMutex(mutex);
+		if(shown == image){
+			SetStatus("Failed to read image");
+		}
+		UnlockWinViewMutex(mutex);
+
+		PostMessage(hImage, WM_TERMINATE_ME, 0, (LPARAM)image);
+		return 0;
+	}
+
+	image->width = wvimg->width;
+	image->height = wvimg->height;
+	CreateWinViewBitmap(wvimg->width, wvimg->height, &bmp, &quad);
+	for(i = 0; i < wvimg->height; i++){
+		unsigned char* row;
+		int j;
+		if(image->go_sleep){
+			image->go_sleep = FALSE;
+			SetEvent(shown->ack_event);
+			WaitForSingleObject(image->wakeup_event, INFINITE);
+			SetEvent(shown->ack_event);
+		}
+		if(image->go_terminate){
+			break;
+		}
+
+		row = wvimg->read(wvimg);
+		for(j = 0; j < wvimg->width; j++){
+			RGBQUAD* px = &quad[i * wvimg->width + j];
+			px->rgbRed = row[j * 4 + 0];
+			px->rgbGreen = row[j * 4 + 1];
+			px->rgbBlue = row[j * 4 + 2];
+			px->rgbReserved = 0;
+		}
+	}
+	wvimg->close(wvimg);
+
+	if(image->go_terminate){
+		image->go_terminate = FALSE;
+		DeleteObject(bmp);
 	}else{
-		CreateWinViewBitmap(img->width, img->height, &local_bmp, &local_quad);
-
-		SetProgress(1);
-		SetStatus("Reading an image");
-		for(i = 0; i < img->height; i++){
-			unsigned char* data;
-			LockWinViewMutex(image_mutex);
-			if(image_kill){
-				img->close(img);
-				UnlockWinViewMutex(image_mutex);
-				free(imgpath);
-				return 0;
-			}
-			UnlockWinViewMutex(image_mutex);
-			SetProgress(1 + ((double)i / img->height * 99));
-			data = img->read(img);
-			if(data != NULL){
-				int j;
-				for(j = 0; j < img->width; j++){
-					RGBQUAD* q = &local_quad[i * img->width + j];
-					unsigned char* px = &data[j * 4];
-					double op = 1.0 - (double)px[3] / 255;
-					unsigned char c;
-					q->rgbRed = px[0];
-					q->rgbGreen = px[1];
-					q->rgbBlue = px[2];
-
-					c = ((i / 16 + j / 16) % 2) ? 0x80 : 0x60;
-
-					q->rgbRed += op * c;
-					q->rgbGreen += op * c;
-					q->rgbBlue += op * c;
-
-					q->rgbReserved = 0;
-				}
-				free(data);
-			}
-		}
-
-		SetProgress(100);
-
-		sprintf(txt, "%dx%d, %s image", img->width, img->height, img->name);
-
-		strcpy(ImageStatus, txt);
-		ImageWidth = img->width;
-		ImageHeight = img->height;
-
-		img->close(img);
-
-		if(image_name != NULL && strcmp(image_name, imgpath) == 0){
-			image_bmp = local_bmp;
-			image_quad = local_quad;
-		}
+		image->bitmap = bmp;
+		PostMessage(hImage, WM_COMPLETED, 0, (LPARAM)image);
 	}
-	if(image_name != NULL && strcmp(image_name, imgpath) == 0){
-		PostMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
-	}
-	free(imgpath);
+
 	return 0;
 }
 
 BOOL InitImageClass(void){
 	WNDCLASSEX wc;
 
-	image_mutex = CreateWinViewMutex();
-	image_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+	InitDIBCache();
+
+	mutex = CreateWinViewMutex();
 
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -193,76 +197,49 @@ BOOL InitImageClass(void){
 	return RegisterClassEx(&wc);
 }
 
-void DestoryImageThreadIfPresent(void){
-	if(image_thread != NULL){
-		LockWinViewMutex(image_mutex);
-		image_kill = TRUE;
-		UnlockWinViewMutex(image_mutex);
-		WaitForSingleObject(image_thread, INFINITE);
-		image_kill = FALSE;
-		CloseHandle(image_thread);
-		image_thread = NULL;
-	}
-}
-
 void ShowImage(int index){
-	const char* path = path_list[index];
-	DWORD ident;
-	BOOL existed = TRUE;
-
-	reading_path = path;
+	char Status[1024];
+	image_t* image;
 
 	if(hImage == NULL){
-		RECT r;
-
-		GetWindowRect(hMain, &r);
-
-		hImage = CreateWindow("winviewimage", "Image", WS_OVERLAPPEDWINDOW, r.right, r.top, 320, 240, NULL, 0, hInst, NULL);
-
+		hImage = CreateWindow("winviewimage", "Image", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 320, 200, NULL, 0, hInst, NULL);
 		ShowWindow(hImage, SW_NORMAL);
 		UpdateWindow(hImage);
-
-		SetFocus(hMain);
-
-		existed = FALSE;
 	}
 
-	image_name = path;
+	image = images[index];
 
-	DestoryImageThreadIfPresent();
+	if(shown != NULL && shown->thread != NULL){
+		shown->go_sleep = TRUE;
+		WaitForSingleObject(shown->ack_event, INFINITE);
+	}
 
-	image_bmp = NULL;
-	image_quad = NULL;
-	failed = FALSE;
-	if(existed) SendMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+	LockWinViewMutex(mutex);
+	shown = image;
+	UnlockWinViewMutex(mutex);
 
-	if((image_bmp = GetDIBCache(path, &ImageWidth, &ImageHeight, ImageStatus)) != NULL){
-		SendMessage(hImage, WM_FINISHED_IMAGE, 0, 0);
+	if(GetDIBCache(image->path, &ImageWidth, &ImageHeight, Status) == NULL){
+		if(image->thread == NULL){
+			DWORD id;
+			image->thread = CreateThread(NULL, 0, ImageThread, image, 0, &id);
+		}else{
+			SetEvent(image->wakeup_event);
+		}
+		WaitForSingleObject(image->ack_event, INFINITE);
 	}else{
-		image_thread = CreateThread(NULL, 0, ImageThread, (LPVOID)path, 0, &ident);
-		WaitForSingleObject(image_event, INFINITE);
-	}	
+		RECT r;
+		int style;
+
+		SetRect(&r, 0, 0, ImageWidth, ImageHeight);
+		style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
+		AdjustWindowRect(&r, style, FALSE);
+		SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+
+		AdjustImageWindowSize();
+
+		InvalidateRect(hImage, NULL, FALSE);
+	}
 }
 
 void DeleteImage(int index){
-	LRESULT count, cursel;
-
-	SendMessage(hListbox, LB_DELETESTRING, index, 0);
-
-	count = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
-	cursel = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
-	if(count == 0){
-		DestoryImageThreadIfPresent();
-		DestroyWindow(hImage);
-		hImage = NULL;
-		ReadyStatus();
-	}else if(cursel == LB_ERR){
-		int ind = index == 0 ? 0 : (index - 1);
-		SendMessage(hListbox, LB_SETCURSEL, ind, 0);
-		ShowImage(ind);
-	}
-
-	DestroyDIBCache(path_list[index]);
-	free(path_list[index]);
-	arrdel(path_list, index);
 }

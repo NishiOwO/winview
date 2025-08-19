@@ -13,8 +13,9 @@
 #include <sys/stat.h>
 
 enum WM_USERS {
-	WM_FINISHED_IMAGE = WM_USER,
-	WM_SB_SETTEXT
+	WM_TERMINATE_ME = WM_USER,
+	WM_SB_SETTEXT,
+	WM_COMPLETED
 };
 
 typedef struct wvimage {
@@ -76,6 +77,5 @@ void QueueImage(const char* path, const char* title);
 void ShowImage(int index);
 void DeleteImage(int index);
 BOOL InitImageClass(void);
-void DestoryImageThreadIfPresent(void);
 
 #endif
