@@ -33,14 +33,16 @@ static unsigned char* XPMDriverRead(void* ptr){
 				char* ch = malloc(opaque->cpp + 1);
 				ch[opaque->cpp] = 0;
 
-				for(i = 0; i < strlen(line) && i < opaque->cpp * img->width; i += opaque->cpp){
-					DWORD c;
-					int j;
-					memcpy(ch, line + i, opaque->cpp);
-					c = shget(opaque->colors, ch);
-					for(j = 0; j < 4; j++){
-						row[i / opaque->cpp * 4 + j] = (c >> 24) & 0xff;
-						c = c << 8;
+				if(strlen(line) == opaque->cpp * img->width){
+					for(i = 0; i < strlen(line) && i < opaque->cpp * img->width; i += opaque->cpp){
+						DWORD c;
+						int j;
+						memcpy(ch, line + i, opaque->cpp);
+						c = shget(opaque->colors, ch);
+						for(j = 0; j < 4; j++){
+							row[i / opaque->cpp * 4 + j] = (c >> 24) & 0xff;
+							c = c << 8;
+						}
 					}
 				}
 
