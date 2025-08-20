@@ -13,11 +13,11 @@ static unsigned char* TIFFDriverRead(void* ptr) {
 	TIFF_UINT32_T* raster = malloc(img->width * img->height * 4);
 	int	       i, j;
 
-	TIFFReadRGBAImage(opaque->tiff, img->width, img->height, raster, 0);
+	TIFFReadRGBAImageOriented(opaque->tiff, img->width, img->height, raster, ORIENTATION_TOPLEFT, 0);
 	for(i = 0; i < img->height; i++) {
 		for(j = 0; j < img->width; j++) {
 			unsigned char* d = &dat[(i * img->width + j) * 4];
-			DWORD	       r = raster[(img->height - i - 1) * img->width + j];
+			DWORD	       r = raster[i * img->width + j];
 			d[0]		 = TIFFGetR(r);
 			d[1]		 = TIFFGetG(r);
 			d[2]		 = TIFFGetB(r);
