@@ -18,12 +18,19 @@ enum WM_USERS {
 	WM_COMPLETED
 };
 
+enum WVIMAGE_TYPE {
+	WVIMAGE_READ_ROW = 0,
+	WVIMAGE_READ_FRAME,
+	WVIMAGE_READ_FRAME_T
+};
+
 typedef struct wvimage {
-	void*	    opaque;
-	int	    width;
-	int	    height;
-	FILE*	    fp;
-	const char* name;
+	void*	      opaque;
+	int	      width;
+	int	      height;
+	FILE*	      fp;
+	const char*   name;
+	unsigned char type;
 	void (*close)(void* ptr);
 	unsigned char* (*read)(void* ptr);
 } wvimage_t;

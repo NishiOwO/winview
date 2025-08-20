@@ -1,5 +1,7 @@
 #include <wvcommon.h>
 
+#define PATTERNSZ 16
+
 typedef struct image {
 	char*	path;
 	HANDLE	thread;
@@ -162,51 +164,83 @@ DWORD WINAPI ImageThread(LPVOID param) {
 	image->width  = wvimg->width;
 	image->height = wvimg->height;
 	CreateWinViewBitmap(wvimg->width, wvimg->height, &bmp, &quad);
-	for(i = 0; i < wvimg->height; i++) {
-		unsigned char* row;
+	if(wvimg->type == WVIMAGE_READ_ROW) {
+		for(i = 0; i < wvimg->height; i++) {
+			unsigned char* row;
+			int	       j;
+			if(image->go_sleep) {
+				image->go_sleep = FALSE;
+				SetEvent(shown->ack_event);
+				WaitForSingleObject(image->wakeup_event, INFINITE);
+				SetEvent(shown->ack_event);
+			}
+			if(image->go_terminate) {
+				break;
+			}
+
+			LockWinViewMutex(mutex);
+			if(shown == image) {
+				SetProgress((double)i / wvimg->height * 100);
+			}
+			UnlockWinViewMutex(mutex);
+
+			row = wvimg->read(wvimg);
+			for(j = 0; j < wvimg->width; j++) {
+				RGBQUAD* px = &quad[i * wvimg->width + j];
+				double	 s;
+				int	 c = ((i / PATTERNSZ + j / PATTERNSZ) % 2) ? 0x80 : 0x60;
+
+				if(row == NULL) {
+					s	     = 0;
+					px->rgbRed   = 0;
+					px->rgbGreen = 0;
+					px->rgbBlue  = 0;
+				} else {
+					s	     = (double)row[j * 4 + 3] / 255;
+					px->rgbRed   = row[j * 4 + 0] * s;
+					px->rgbGreen = row[j * 4 + 1] * s;
+					px->rgbBlue  = row[j * 4 + 2] * s;
+				}
+
+				s = 1 - s;
+				px->rgbRed += s * c;
+				px->rgbGreen += s * c;
+				px->rgbBlue += s * c;
+
+				px->rgbReserved = 0;
+			}
+			free(row);
+		}
+	} else if(wvimg->type == WVIMAGE_READ_FRAME) {
+		unsigned char* d = wvimg->read(wvimg);
 		int	       j;
-		if(image->go_sleep) {
-			image->go_sleep = FALSE;
-			SetEvent(shown->ack_event);
-			WaitForSingleObject(image->wakeup_event, INFINITE);
-			SetEvent(shown->ack_event);
+		for(i = 0; i < wvimg->height; i++) {
+			for(j = 0; j < wvimg->width; j++) {
+				RGBQUAD*       px = &quad[i * wvimg->width + j];
+				double	       s;
+				int	       c   = ((i / PATTERNSZ + j / PATTERNSZ) % 2) ? 0x80 : 0x60;
+				unsigned char* src = &d[(i * wvimg->width + j) * 4];
+
+				s	     = (double)src[3] / 255;
+				px->rgbRed   = src[0] * s;
+				px->rgbGreen = src[1] * s;
+				px->rgbBlue  = src[2] * s;
+
+				s = 1 - s;
+				px->rgbRed += s * c;
+				px->rgbGreen += s * c;
+				px->rgbBlue += s * c;
+
+				px->rgbReserved = 0;
+			}
 		}
-		if(image->go_terminate) {
-			break;
-		}
+		free(d);
 
 		LockWinViewMutex(mutex);
 		if(shown == image) {
-			SetProgress((double)i / wvimg->height * 100);
+			SetProgress(100);
 		}
 		UnlockWinViewMutex(mutex);
-
-		row = wvimg->read(wvimg);
-		for(j = 0; j < wvimg->width; j++) {
-			RGBQUAD* px = &quad[i * wvimg->width + j];
-			double	 s;
-			int	 c = ((i / 16 + j / 16) % 2) ? 0x80 : 0x60;
-
-			if(row == NULL) {
-				s	     = 0;
-				px->rgbRed   = 0;
-				px->rgbGreen = 0;
-				px->rgbBlue  = 0;
-			} else {
-				s	     = (double)row[j * 4 + 3] / 255;
-				px->rgbRed   = row[j * 4 + 0] * s;
-				px->rgbGreen = row[j * 4 + 1] * s;
-				px->rgbBlue  = row[j * 4 + 2] * s;
-			}
-
-			s = 1 - s;
-			px->rgbRed += s * c;
-			px->rgbGreen += s * c;
-			px->rgbBlue += s * c;
-
-			px->rgbReserved = 0;
-		}
-		free(row);
 	}
 	wvimg->close(wvimg);
 
