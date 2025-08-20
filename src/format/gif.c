@@ -8,7 +8,7 @@ typedef struct gifopaque {
 } gifopaque_t;
 
 #define EXTRACT_BITS(x, n, w) ((x >> n) & ((1U << w) - 1))
-#define IMAGE_FRAME (1) /* nish didnt implement animation api yet boo */
+#define FRAME_NUM (0) // nish didnt implement animation api boo
 
 static unsigned char* GIFDriverRead(void* ptr) {
 	wvimage_t*     img    = ptr;
@@ -20,12 +20,12 @@ static unsigned char* GIFDriverRead(void* ptr) {
 	row = malloc(img->width * 4);
 	memset(row, 0, img->width * 4);
 
-	for(int i = 0; i < IMAGE_FRAME; i++) {
+	for(int i = 0; i <= FRAME_NUM; i++) {
 		SavedImage*	image	   = &opaque->file->SavedImages[i];
 		GifImageDesc*	image_desc = &image->ImageDesc;
 		ColorMapObject* color_map  = opaque->file->SColorMap;
-		int		yy	   = opaque->y - image_desc->Top;
-		int		dispose	   = DISPOSAL_UNSPECIFIED, j;
+		int		transp = 0, transp_idx = -1, dispose = DISPOSAL_UNSPECIFIED;
+		int		yy = opaque->y - image_desc->Top, j;
 
 		if(image_desc->ColorMap) color_map = image_desc->ColorMap;
 		if(color_map == NULL) return NULL;
@@ -37,9 +37,9 @@ static unsigned char* GIFDriverRead(void* ptr) {
 			// filter only graphics extensions
 			if(blk->Function != GRAPHICS_EXT_FUNC_CODE || blk->ByteCount != 4) continue;
 
+			transp	= EXTRACT_BITS(blk->Bytes[0], 0, 1);
 			dispose = EXTRACT_BITS(blk->Bytes[0], 2, 3);
-
-			// TODO: handle transparency flags...
+			if(transp) transp_idx = blk->Bytes[3];
 		}
 
 		// apply disposal
@@ -48,13 +48,13 @@ static unsigned char* GIFDriverRead(void* ptr) {
 		// fill row with background color before processing
 		case DISPOSAL_UNSPECIFIED:
 		case DISPOSE_BACKGROUND: {
-			GifWord	      bg_i = opaque->file->SBackGroundColor;
+			GifWord	      bg_idx = opaque->file->SBackGroundColor;
 			GifColorType* rgb;
 
-			if(opaque->file->SColorMap == NULL) return NULL;			 /* cant fill with bg color without global pallete */
-			if(bg_i < 0 || bg_i >= opaque->file->SColorMap->ColorCount) return NULL; /* invalid color index */
+			if(opaque->file->SColorMap == NULL) return NULL;			     /* cant fill with bg color without global pallete */
+			if(bg_idx < 0 || bg_idx >= opaque->file->SColorMap->ColorCount) return NULL; /* invalid color index */
 
-			rgb = &opaque->file->SColorMap->Colors[bg_i];
+			rgb = &opaque->file->SColorMap->Colors[bg_idx];
 
 			for(j = 0; j < img->width; j++) {
 				unsigned char* px = &row[j * 4];
@@ -62,7 +62,7 @@ static unsigned char* GIFDriverRead(void* ptr) {
 				px[0] = rgb->Red;
 				px[1] = rgb->Green;
 				px[2] = rgb->Blue;
-				px[3] = 255; /* fully opaque */
+				px[3] = (!transp || bg_idx != transp_idx) * 255;
 			}
 
 			break;
@@ -73,7 +73,7 @@ static unsigned char* GIFDriverRead(void* ptr) {
 		// however one way to implement this is just to... skip this frame.
 		// we dont care about it since it doesnt affect the final frame.
 		case DISPOSE_PREVIOUS: {
-			if(i == IMAGE_FRAME - 1) break; /* cannot skip if we ARE the nth frame */
+			if(i == FRAME_NUM) break; /* cannot skip if we ARE the nth frame */
 			continue;
 		}
 
@@ -87,19 +87,19 @@ static unsigned char* GIFDriverRead(void* ptr) {
 		for(j = 0; j < img->width; j++) {
 			unsigned char* px = &row[j * 4];
 			int	       xx = j - image_desc->Left;
-			GifByteType    c;
+			GifByteType    idx;
 			GifColorType*  rgb;
 
 			if(xx < 0 || xx >= image_desc->Width) continue; /* frame is not in view */
 
-			c = image->RasterBits[image_desc->Width * yy + xx];
+			idx = image->RasterBits[image_desc->Width * yy + xx];
 
-			if(c >= color_map->ColorCount) return NULL; /* invalid color index */
-			rgb   = &color_map->Colors[c];
+			if(idx >= color_map->ColorCount) return NULL; /* invalid color index */
+			rgb   = &color_map->Colors[idx];
 			px[0] = rgb->Red;
 			px[1] = rgb->Green;
 			px[2] = rgb->Blue;
-			px[3] = 255; /* fully opaque */
+			px[3] = (!transp || idx != transp_idx) * 255;
 		}
 	}
 
@@ -129,7 +129,6 @@ wvimage_t* TryGIFDriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "GIF";
 	img->close = GIFDriverClose;
 	img->read  = GIFDriverRead;
 
@@ -150,6 +149,7 @@ wvimage_t* TryGIFDriver(const char* path) {
 	opaque->y    = 0;
 	opaque->file = file;
 
+	img->name   = "GIF";
 	img->width  = file->SWidth;
 	img->height = file->SHeight;
 
