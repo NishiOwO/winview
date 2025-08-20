@@ -5,7 +5,7 @@ This release supports following formats:
  - PNG
  - JPEG
  - TIFF
- - XPM (WIP)
+ - XPM
  - (GIF support is in progress - sit tightly)
 
 with following features:

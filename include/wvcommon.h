@@ -30,6 +30,7 @@ typedef struct wvimage {
 typedef wvimage_t*(DriverProc)(const char* path);
 
 #define Allocate(var) var = malloc(sizeof(*var));memset(var, 0, sizeof(*var));
+#define CreateRGBA(r,g,b,a) (((r) << 24) | ((g) << 16) | ((b) << 8) | ((a) << 0))
 
 /* image drivers */
 wvimage_t* TryJPEGDriver(const char* path);
@@ -65,6 +66,7 @@ void UnlockWinViewMutex(HANDLE mutex);
 void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
 void ReadyStatus(void);
 void AdjustImageWindowSize(void);
+DWORD ParseHex(const char* str, int len);
 
 /* image.c */
 extern HWND hImage;

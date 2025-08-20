@@ -189,3 +189,22 @@ readjust:
 
 	SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
 }
+
+DWORD ParseHex(const char* str, int len){
+	int i;
+	DWORD n = 0;
+	for(i = 0; i < len; i++){
+		DWORD c = 0;
+		if('0' <= str[i] && str[i] <= '9'){
+			c = str[i] - '0';
+		}else if('a' <= str[i] && str[i] <= 'f'){
+			c = str[i] - 'a' + 10;
+		}else if('A' <= str[i] && str[i] <= 'F'){
+			c = str[i] - 'A' + 10;
+		}
+
+		n = n << 4;
+		n = n | c;
+	}
+	return n;
+}
