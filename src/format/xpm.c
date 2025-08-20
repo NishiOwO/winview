@@ -147,13 +147,15 @@ repeat:
 						l[0] = 0;
 						if(strcmp(arg, "c") == 0){
 							char* c = l + 1;
-							if(c[0] == '#'){
-								char* str = malloc(opaque->cpp + 1);
-								DWORD r, g, b, a = 255;
-								DWORD rgba;
+							DWORD r, g, b, a = 255;
+							DWORD rgba;
+							char* str = malloc(opaque->cpp + 1);
 
-								memcpy(str, line, opaque->cpp);
-								str[opaque->cpp] = 0;
+							memcpy(str, line, opaque->cpp);
+							str[opaque->cpp] = 0;
+							if(strcmp(c, "None") == 0 || strcmp(c, "transparent") == 0){
+								r = g = b = a = 0;
+							}else if(c[0] == '#'){
 
 								if(strlen(c) == 4){
 									r = ParseHex(c + 1, 1);
@@ -173,17 +175,18 @@ repeat:
 									free(line);
 									return NULL;
 								}
-
-								rgba = CreateRGBA(r, g, b, a);
-								shput(opaque->colors, str, rgba);
-
-								free(str);
 								repeat = 0;
 							}else{
+								free(str);
 								XPMDriverClose(img);
 								free(line);
 								return NULL;
 							}
+
+							rgba = CreateRGBA(r, g, b, a);
+							shput(opaque->colors, str, rgba);
+
+							free(str);
 						}
 						if(repeat && (arg = strchr(l, ' ')) != NULL){
 							arg++;
