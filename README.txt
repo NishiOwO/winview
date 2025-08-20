@@ -6,7 +6,7 @@ This release supports following formats:
  - JPEG
  - TIFF
  - XPM
- - (GIF support is in progress - sit tightly)
+ - GIF (no animations yet)
 
 with following features:
  - Re-Aspect
