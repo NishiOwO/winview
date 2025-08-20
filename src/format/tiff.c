@@ -61,6 +61,9 @@ static void TIFFDriverClose(void* ptr){
 	free(img);
 }
 
+static void TIFFDriverError(const char* module, const char* fmt, va_list ap){
+}
+
 wvimage_t* TryTIFFDriver(const char* path){
 	wvimage_t* img;
 	tiffopaque_t* opaque;
@@ -74,6 +77,8 @@ wvimage_t* TryTIFFDriver(const char* path){
 	img->read = TIFFDriverRead;
 
 	img->opaque = Allocate(opaque);
+
+	TIFFSetErrorHandler(TIFFDriverError);
 
 	opaque->tiff = TIFFOpen(path, "rb");
 	if(opaque->tiff == NULL){
