@@ -18,7 +18,8 @@ button_t buttons[] = {
 const char* exts[] = {
 	"JPEG", "*.jpg;*.jpeg",
 	"PNG", "*.png",
-	"TIFF", "*.tiff;*.tif"
+	"TIFF", "*.tiff;*.tif",
+	"XPM", "*.xpm"
 };
 char exttext[1024];
 int extseek = 0;
@@ -222,9 +223,29 @@ char** ParseArgs(const char* str){
 	return r;
 }
 
-void AddEntry(const char* str){
-	strcpy(exttext + extseek, str);
-	extseek += strlen(str) + 1;
+void AddEntry(const char* name, const char* exts){
+	char* exts_c = DuplicateString(exts);
+	int i;
+	for(i = 0; exts_c[i] != 0; i++){
+		if(exts_c[i] == ';') exts_c[i] = ' ';
+	}
+
+	strcpy(exttext + extseek, name);
+	extseek += strlen(name);
+
+	strcpy(exttext + extseek, " (");
+	extseek += 2;
+
+	strcpy(exttext + extseek, exts_c);
+	extseek += strlen(exts_c);
+
+	strcpy(exttext + extseek, ")");
+	extseek += 2;
+
+	strcpy(exttext + extseek, exts);
+	extseek += strlen(exts) + 1;
+
+	free(exts_c);
 }
 
 int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow){
@@ -246,16 +267,13 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		}
 	}
 
-	AddEntry("All Supported Formats");
-	AddEntry(allsupport);
+	AddEntry("All Supported Formats", allsupport);
 
 	for(i = 0; i < sizeof(exts) / sizeof(exts[0]); i += 2){
-		AddEntry(exts[i]);
-		AddEntry(exts[i + 1]);
+		AddEntry(exts[i], exts[i + 1]);
 	}
 
-	AddEntry("All files");
-	AddEntry("*.*");
+	AddEntry("All files", "*.*");
 
 	hInst = hCurInst;
 	if(!InitClass()){
