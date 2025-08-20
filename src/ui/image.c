@@ -123,7 +123,8 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	return 0;
 }
 
-static char  txt[256];
+static char txt[256];
+
 DWORD WINAPI ImageThread(LPVOID param) {
 	image_t*   image = (image_t*)param;
 	int	   i;

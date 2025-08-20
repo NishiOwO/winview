@@ -54,24 +54,25 @@ HBRUSH		     GetSolidBrushCached(int r, int g, int b) {
 }
 
 static brushcache_t* hatchcache = NULL;
-HBRUSH		     GetHatchBrushCached(int r, int g, int b) {
-	      int	   i;
-	      brushcache_t c;
 
-	      for(i = 0; i < arrlen(hatchcache); i++) {
-		      if(hatchcache[i].r == r && hatchcache[i].g == g && hatchcache[i].b == b) {
-			      return hatchcache[i].brush;
-		      }
-	      }
+HBRUSH GetHatchBrushCached(int r, int g, int b) {
+	int	     i;
+	brushcache_t c;
 
-	      c.r     = r;
-	      c.g     = g;
-	      c.b     = b;
-	      c.brush = CreateHatchBrush(HS_DIAGCROSS, RGB(r, g, b));
+	for(i = 0; i < arrlen(hatchcache); i++) {
+		if(hatchcache[i].r == r && hatchcache[i].g == g && hatchcache[i].b == b) {
+			return hatchcache[i].brush;
+		}
+	}
 
-	      arrput(hatchcache, c);
+	c.r	= r;
+	c.g	= g;
+	c.b	= b;
+	c.brush = CreateHatchBrush(HS_DIAGCROSS, RGB(r, g, b));
 
-	      return c.brush;
+	arrput(hatchcache, c);
+
+	return c.brush;
 }
 
 void SetProgress(int value) { PostMessage(hProgress, PBM_SETPOS, value, 0); }
@@ -120,9 +121,10 @@ void CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad) {
 }
 
 static char txt[256];
-void	    ReadyStatus(void) {
-	       sprintf(txt, "Ready - Version %s", wvversion);
-	       SetStatus(txt);
+
+void ReadyStatus(void) {
+	sprintf(txt, "Ready - Version %s", wvversion);
+	SetStatus(txt);
 }
 
 void AdjustImageWindowSize(void) {

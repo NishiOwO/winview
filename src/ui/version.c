@@ -3,7 +3,15 @@
 
 const char* wvversion = "0.0";
 
-static const char* texts[] = {"https://github.com/nishiowo/winview", "", "-Version %s", "-Copyright 2025 by WinView developers - All Rights Reserved", "", "+WinView", NULL};
+static const char* texts[] = {
+    "https://github.com/nishiowo/winview",			   /**/
+    "",								   /**/
+    "-Version %s",						   /**/
+    "-Copyright 2025 by WinView developers - All Rights Reserved", /**/
+    "",								   /**/
+    "+WinView",							   /**/
+    NULL							   /**/
+};
 
 LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_CLOSE) {

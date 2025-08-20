@@ -34,7 +34,7 @@ get-version:
 	@grep wvversion src/ui/version.c | head -n1 | grep -Eo '".+"' | xargs echo
 
 format:
-	clang-format --verbose -i include/*.h src/*.c src/*/*.c
+	clang-format --verbose -i `find include src "(" -name "*.c" -or -name "*.h" ")" -and -not -name "stb_ds.h"`
 
 clean:
 	rm -f external/*/src/*.o src/*.o src/*/*.o external/*.a *.exe src/*.res
