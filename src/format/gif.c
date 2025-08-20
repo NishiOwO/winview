@@ -8,7 +8,7 @@ typedef struct gifopaque {
 } gifopaque_t;
 
 #define EXTRACT_BITS(x, n, w) ((x >> n) & ((1U << w) - 1))
-#define IMAGE_FRAME (10) /* nish didnt implement animation api yet boo */
+#define IMAGE_FRAME (1) /* nish didnt implement animation api yet boo */
 
 static unsigned char* GIFDriverRead(void* ptr) {
 	wvimage_t*     img    = ptr;
