@@ -120,7 +120,6 @@ static void GIFDriverClose(void* ptr) {
 wvimage_t* TryGIFDriver(const char* path) {
 	wvimage_t*   img;
 	gifopaque_t* opaque;
-	/*  */
 	GifFileType* file;
 	int	     error;
 
