@@ -11,14 +11,18 @@ static unsigned char* TIFFDriverRead(void* ptr) {
 	tiffopaque_t*  opaque = img->opaque;
 	unsigned char* dat    = malloc(img->width * img->height * 4);
 	TIFF_UINT32_T* raster = malloc(img->width * img->height * 4);
-	int	       i;
+	int	       i, j;
 
 	TIFFReadRGBAImage(opaque->tiff, img->width, img->height, raster, 0);
-	for(i = 0; i < img->width * img->height; i++) {
-		dat[i * 4 + 0] = TIFFGetR(raster[i]);
-		dat[i * 4 + 1] = TIFFGetG(raster[i]);
-		dat[i * 4 + 2] = TIFFGetB(raster[i]);
-		dat[i * 4 + 3] = TIFFGetA(raster[i]);
+	for(i = 0; i < img->height; i++) {
+		for(j = 0; j < img->width; j++) {
+			unsigned char* d = &dat[(i * img->width + j) * 4];
+			DWORD	       r = raster[(img->height - i - 1) * img->width + j];
+			d[0]		 = TIFFGetR(r);
+			d[1]		 = TIFFGetG(r);
+			d[2]		 = TIFFGetB(r);
+			d[3]		 = TIFFGetA(r);
+		}
 	}
 
 	free(raster);

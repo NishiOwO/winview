@@ -21,6 +21,20 @@ static image_t*	 shown	= NULL;
 static image_t** images = NULL;
 static HANDLE	 mutex	= NULL;
 
+void ApplyPattern(RGBQUAD* px, int x, int y, int a) {
+	double s = (double)a / 255;
+	int    c = ((y / PATTERNSZ + x / PATTERNSZ) % 2) ? 0x80 : 0x60;
+
+	px->rgbRed *= s;
+	px->rgbBlue *= s;
+	px->rgbGreen *= s;
+
+	s = 1 - s;
+	px->rgbRed += s * c;
+	px->rgbGreen += s * c;
+	px->rgbBlue += s * c;
+}
+
 void QueueImage(const char* path, const char* title) {
 	image_t* image;
 
@@ -187,25 +201,20 @@ DWORD WINAPI ImageThread(LPVOID param) {
 			row = wvimg->read(wvimg);
 			for(j = 0; j < wvimg->width; j++) {
 				RGBQUAD* px = &quad[i * wvimg->width + j];
-				double	 s;
-				int	 c = ((i / PATTERNSZ + j / PATTERNSZ) % 2) ? 0x80 : 0x60;
 
 				if(row == NULL) {
-					s	     = 0;
 					px->rgbRed   = 0;
 					px->rgbGreen = 0;
 					px->rgbBlue  = 0;
-				} else {
-					s	     = (double)row[j * 4 + 3] / 255;
-					px->rgbRed   = row[j * 4 + 0] * s;
-					px->rgbGreen = row[j * 4 + 1] * s;
-					px->rgbBlue  = row[j * 4 + 2] * s;
-				}
 
-				s = 1 - s;
-				px->rgbRed += s * c;
-				px->rgbGreen += s * c;
-				px->rgbBlue += s * c;
+					ApplyPattern(px, j, i, 0);
+				} else {
+					px->rgbRed   = row[j * 4 + 0];
+					px->rgbGreen = row[j * 4 + 1];
+					px->rgbBlue  = row[j * 4 + 2];
+
+					ApplyPattern(px, j, i, row[j * 4 + 3]);
+				}
 
 				px->rgbReserved = 0;
 			}
@@ -216,20 +225,14 @@ DWORD WINAPI ImageThread(LPVOID param) {
 		int	       j;
 		for(i = 0; i < wvimg->height; i++) {
 			for(j = 0; j < wvimg->width; j++) {
-				RGBQUAD*       px = &quad[i * wvimg->width + j];
-				double	       s;
-				int	       c   = ((i / PATTERNSZ + j / PATTERNSZ) % 2) ? 0x80 : 0x60;
+				RGBQUAD*       px  = &quad[i * wvimg->width + j];
 				unsigned char* src = &d[(i * wvimg->width + j) * 4];
 
-				s	     = (double)src[3] / 255;
-				px->rgbRed   = src[0] * s;
-				px->rgbGreen = src[1] * s;
-				px->rgbBlue  = src[2] * s;
+				px->rgbRed   = src[0];
+				px->rgbGreen = src[1];
+				px->rgbBlue  = src[2];
 
-				s = 1 - s;
-				px->rgbRed += s * c;
-				px->rgbGreen += s * c;
-				px->rgbBlue += s * c;
+				ApplyPattern(px, j, i, src[3]);
 
 				px->rgbReserved = 0;
 			}
