@@ -7,12 +7,12 @@
 #include <tiffio.h>
 #include <gif_lib.h>
 
-LRESULT CALLBACK CreditsDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
-	if(msg == WM_CLOSE){
+LRESULT CALLBACK CreditsDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+	if(msg == WM_CLOSE) {
 		EndDialog(hWnd, 0);
-	}else if(msg == WM_COMMAND){
+	} else if(msg == WM_COMMAND) {
 		if(LOWORD(wp) == 100) EndDialog(hWnd, 0);
-	}else if(msg == WM_INITDIALOG){
+	} else if(msg == WM_INITDIALOG) {
 		RECT r;
 		HWND text;
 		char txt[1024];
@@ -33,7 +33,7 @@ LRESULT CALLBACK CreditsDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp){
 		sprintf(txt + strlen(txt), "  giflib %d.%d.%d\r\n", GIFLIB_MAJOR, GIFLIB_MINOR, GIFLIB_RELEASE);
 
 		text = CreateWindow("EDIT", txt, WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_READONLY, 5, 5, (r.right - r.left) - 10, (r.bottom - r.top) - 15 - 25, hWnd, 0, hInst, NULL);
-	}else{
+	} else {
 		return FALSE;
 	}
 	return TRUE;

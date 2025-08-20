@@ -2,22 +2,22 @@
 
 #include <tiffio.h>
 
-//#define MIGHT_BE_SLOW
+// #define MIGHT_BE_SLOW
 
 typedef struct tiffopaque {
-	TIFF* tiff;
+	TIFF*	      tiff;
 	TIFFRGBAImage rgba;
 #ifndef MIGHT_BE_SLOW
 	TIFF_UINT32_T* image;
-	int y;
+	int	       y;
 #endif
 } tiffopaque_t;
 
-static unsigned char* TIFFDriverRead(void* ptr){
-	wvimage_t* img = ptr;
-	tiffopaque_t* opaque = img->opaque;
-	unsigned char* row = malloc(img->width * 4);
-	int i;
+static unsigned char* TIFFDriverRead(void* ptr) {
+	wvimage_t*     img    = ptr;
+	tiffopaque_t*  opaque = img->opaque;
+	unsigned char* row    = malloc(img->width * 4);
+	int	       i;
 #ifdef MIGHT_BE_SLOW
 	TIFF_UINT32_T* trow = malloc(img->width * 4);
 
@@ -25,7 +25,7 @@ static unsigned char* TIFFDriverRead(void* ptr){
 	opaque->rgba.row_offset++;
 #endif
 
-	for(i = 0; i < img->width; i++){
+	for(i = 0; i < img->width; i++) {
 		unsigned char* px = &row[i * 4];
 #ifdef MIGHT_BE_SLOW
 		TIFF_UINT32_T tpx = trow[i];
@@ -46,11 +46,11 @@ static unsigned char* TIFFDriverRead(void* ptr){
 	return row;
 }
 
-static void TIFFDriverClose(void* ptr){
-	wvimage_t* img = ptr;
+static void TIFFDriverClose(void* ptr) {
+	wvimage_t*    img    = ptr;
 	tiffopaque_t* opaque = img->opaque;
 
-	if(opaque->tiff != NULL){
+	if(opaque->tiff != NULL) {
 #ifndef MIGHT_BE_SLOW
 		free(opaque->image);
 #endif
@@ -61,27 +61,26 @@ static void TIFFDriverClose(void* ptr){
 	free(img);
 }
 
-static void TIFFDriverError(const char* module, const char* fmt, va_list ap){
-}
+static void TIFFDriverError(const char* module, const char* fmt, va_list ap) {}
 
-wvimage_t* TryTIFFDriver(const char* path){
-	wvimage_t* img;
+wvimage_t* TryTIFFDriver(const char* path) {
+	wvimage_t*    img;
 	tiffopaque_t* opaque;
 	TIFF_UINT32_T width, height;
-	char emsg[1024];
+	char	      emsg[1024];
 
 	img = AllocateImage();
 
-	img->name = "TIFF";
+	img->name  = "TIFF";
 	img->close = TIFFDriverClose;
-	img->read = TIFFDriverRead;
+	img->read  = TIFFDriverRead;
 
 	img->opaque = Allocate(opaque);
 
 	TIFFSetErrorHandler(TIFFDriverError);
 
 	opaque->tiff = TIFFOpen(path, "rb");
-	if(opaque->tiff == NULL){
+	if(opaque->tiff == NULL) {
 		TIFFDriverClose(img);
 		return NULL;
 	}
@@ -92,7 +91,7 @@ wvimage_t* TryTIFFDriver(const char* path){
 	TIFFGetField(opaque->tiff, TIFFTAG_IMAGEWIDTH, &width);
 	TIFFGetField(opaque->tiff, TIFFTAG_IMAGELENGTH, &height);
 
-	img->width = width;
+	img->width  = width;
 	img->height = height;
 
 #ifndef MIGHT_BE_SLOW
