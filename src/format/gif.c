@@ -25,7 +25,7 @@ static unsigned char* GIFDriverRead(void* ptr) {
 		GifImageDesc*	image_desc = &image->ImageDesc;
 		ColorMapObject* color_map  = opaque->file->SColorMap;
 		int		yy	   = opaque->y - image_desc->Top;
-		int		dispose, j;
+		int		dispose	   = DISPOSAL_UNSPECIFIED, j;
 
 		if(image_desc->ColorMap) color_map = image_desc->ColorMap;
 		if(color_map == NULL) return NULL;
