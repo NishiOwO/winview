@@ -33,6 +33,7 @@ void ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h) {
 }
 
 static brushcache_t* solidcache = NULL;
+
 HBRUSH		     GetSolidBrushCached(int r, int g, int b) {
 	      int	   i;
 	      brushcache_t c;

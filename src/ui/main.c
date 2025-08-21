@@ -38,6 +38,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 				AdjustImageWindowSize();
 			}
 		}
+		if(m == IDM_VIEW_10_LARGER || m == IDM_VIEW_10_SMALLER) {
+			if(hImage != NULL) {
+				RECT r;
+				int    style;
+				double d = m == IDM_VIEW_10_LARGER ? 1 : -1;
+
+				GetClientRect(hImage, &r);
+				r.right += 0.1 * (r.right - r.left) * d;
+				r.bottom += 0.1 * (r.bottom - r.top) * d;
+
+				style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
+				AdjustWindowRect(&r, style, FALSE);
+				SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+			}
+		}
 		if(m == IDM_ABOUT_CREDITS) DialogBox(hInst, "WVCREDITS", hWnd, (DLGPROC)CreditsDialog);
 		if(m == IDM_ABOUT_VERSION) DialogBox(hInst, "WVVERSION", hWnd, (DLGPROC)VersionDialog);
 		if(m == IDM_LISTBOX) {

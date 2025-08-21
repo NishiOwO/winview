@@ -11,6 +11,8 @@ WVMENU MENU {
 	}
 	POPUP "&View" {
 		MENUITEM "&Re-Aspect", IDM_VIEW_REASPECT
+		MENUITEM "10% Larger", IDM_VIEW_10_LARGER
+		MENUITEM "10% Smaller", IDM_VIEW_10_SMALLER
 	}
 
 	POPUP "&About", HELP {
