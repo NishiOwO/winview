@@ -8,6 +8,7 @@ typedef struct tgaopaque {
 	int	  color_length;
 	int	  image_bits;
 	RGBAPack* color_map;
+	RGBAPack* color_stack;
 } tgaopaque_t;
 
 static char* tgaext = ".tga";
@@ -44,6 +45,27 @@ static void ReadColor(FILE* fp, int bits, RGBAPack* q) {
 	}
 }
 
+static RGBAPack* GetColorMap(wvimage_t* img) {
+	tgaopaque_t*  opaque = (tgaopaque_t*)img->opaque;
+	unsigned char d[2];
+	int	      index = 0;
+
+	if(opaque->image_bits == 16) {
+		fread(&d[0], 2, 1, img->fp);
+
+		index = ReadAsWORD(d, 0);
+	} else if(opaque->image_bits == 8) {
+		fread(&d[0], 1, 1, img->fp);
+
+		index = d[0];
+	}
+
+	index = index - opaque->color_origin;
+	if(index >= opaque->color_length) index = 0;
+
+	return &opaque->color_map[index];
+}
+
 static unsigned char* TGADriverRead(void* ptr) {
 	wvimage_t*     img    = ptr;
 	tgaopaque_t*   opaque = (tgaopaque_t*)img->opaque;
@@ -54,26 +76,12 @@ static unsigned char* TGADriverRead(void* ptr) {
 	if(opaque->type == 1) {
 		if(opaque->color_map != NULL) {
 			for(i = 0; i < img->width; i++) {
-				unsigned char d[2];
-				int	      index = 0;
+				RGBAPack* p = GetColorMap(img);
 
-				if(opaque->image_bits == 16) {
-					fread(&d[0], 2, 1, img->fp);
-
-					index = ReadAsWORD(d, 0);
-				} else if(opaque->image_bits == 8) {
-					fread(&d[0], 1, 1, img->fp);
-
-					index = d[0];
-				}
-
-				index = index - opaque->color_origin;
-				if(index >= opaque->color_length) index = 0;
-
-				row[4 * i + 0] = opaque->color_map[index].red;
-				row[4 * i + 1] = opaque->color_map[index].green;
-				row[4 * i + 2] = opaque->color_map[index].blue;
-				row[4 * i + 3] = opaque->color_map[index].alpha;
+				row[4 * i + 0] = p->red;
+				row[4 * i + 1] = p->green;
+				row[4 * i + 2] = p->blue;
+				row[4 * i + 3] = p->alpha;
 			}
 		}
 	} else if(opaque->type == 2) {
@@ -96,6 +104,52 @@ static unsigned char* TGADriverRead(void* ptr) {
 			row[4 * i + 2] = c;
 			row[4 * i + 3] = 255;
 		}
+	} else if(opaque->type == 9 || opaque->type == 10) {
+		unsigned char c;
+		int	      count;
+		RGBAPack      p;
+		int	      wrote = 0;
+
+	repeat:
+		fread(&c, 1, 1, img->fp);
+
+		count = c & 0x7f;
+		if(c & (1 << 7)) {
+			if(opaque->type == 9) {
+				RGBAPack* ptr = GetColorMap(img);
+				memcpy(&p, ptr, sizeof(p));
+			} else {
+				ReadColor(img->fp, opaque->image_bits, &p);
+			}
+
+			for(i = 0; i < count + 1; i++) {
+				arrput(opaque->color_stack, p);
+			}
+		} else {
+			if(opaque->type == 9) {
+				for(i = 0; i < count; i++) {
+					RGBAPack* ptr = GetColorMap(img);
+					memcpy(&p, ptr, sizeof(p));
+					arrput(opaque->color_stack, p);
+				}
+			} else {
+				for(i = 0; i < count; i++) {
+					ReadColor(img->fp, opaque->image_bits, &p);
+					arrput(opaque->color_stack, p);
+				}
+			}
+		}
+
+		for(i = 0; wrote < img->width && arrlen(opaque->color_stack) > 0; i++) {
+			row[4 * wrote + 0] = opaque->color_stack[0].red;
+			row[4 * wrote + 1] = opaque->color_stack[0].green;
+			row[4 * wrote + 2] = opaque->color_stack[0].blue;
+			row[4 * wrote + 3] = opaque->color_stack[0].alpha;
+			wrote++;
+			arrdel(opaque->color_stack, 0);
+		}
+
+		if(wrote < img->width) goto repeat;
 	}
 
 	return row;
@@ -105,6 +159,7 @@ static void TGADriverClose(void* ptr) {
 	wvimage_t*   img    = ptr;
 	tgaopaque_t* opaque = (tgaopaque_t*)img->opaque;
 
+	if(opaque->color_stack != NULL) arrfree(opaque->color_stack);
 	if(opaque->color_map != NULL) free(opaque->color_map);
 	free(opaque);
 
@@ -173,6 +228,7 @@ wvimage_t* TryTGADriver(const char* path) {
 	opaque->color_length = ReadAsWORD(header, 5);
 	opaque->color_map    = NULL;
 	opaque->image_bits   = header[16];
+	opaque->color_stack  = NULL;
 
 	if(opaque->color_length > 0) {
 		opaque->color_map = malloc(sizeof(*opaque->color_map) * opaque->color_length);
