@@ -6,7 +6,7 @@ This release supports following formats:
  - JPEG
  - TIFF
  - XPM
- - TGA (TODO)
+ - TGA
  - BMP (TODO)
  - GIF (no animations yet)
 
