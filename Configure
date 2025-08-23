@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+
+my @all = ("png", "jpeg", "tiff", "gif", "xpm");
+my @enabled = ();
+foreach my $i (@all){
+	push(@enabled, $i);
+}
+
+open(OUT, ">", "config.mk");
+
+sub scan_proj {
+	print OUT (uc($_[0]) . "_OBJS =");
+
+	opendir(my $dh, "external/$_[0]/src");
+	my @files = readdir($dh);
+	foreach my $fn (@files){
+		if(($fn eq ".") || ($fn eq "..")){
+			next;
+		}
+
+		$fn =~ s/\.c$/.o/;
+		print OUT (" external/$_[0]/src/$fn");
+	}
+
+	closedir($dh);
+
+	print OUT ("\n");
+
+	print OUT ("CFLAGS += -Iexternal/$_[0]/include");
+	if(defined($_[1])){
+		print OUT (" -D$_[1]");
+	}
+	print OUT ("\n");
+
+	print OUT ("OBJS += external/$_[0].a\n");
+	print OUT ("external/$_[0].a: \$(" . uc($_[0]) . "_OBJS)\n");
+	print OUT ("\t\$(AR) rcs \$@ \$(" . uc($_[0]) . "_OBJS)\n");
+	print OUT ("\n");
+}
+
+foreach my $i (@ARGV){
+	my $mode = "add";
+	my $do = $i;
+	if(substr($i, 0, 1) eq "-"){
+		$mode = "del";
+		$do = substr($i, 1);
+	}elsif(substr($i, 0, 1) eq "+"){
+		$do = substr($i, 1);
+	}
+
+	my @query = ($do);
+	if($do eq "all"){
+		@query = ();
+		foreach my $e (@all){
+			push(@query, $e);
+		}
+	}
+
+	foreach my $e (@query){
+		if($mode eq "add"){
+			@enabled = push(@enabled, $e);
+		}elsif($mode eq "del"){
+			@new = ();
+			foreach my $e2 (@enabled) {
+				if(!($e2 eq $e)){
+					push(@new, $e2);
+				}
+			}
+			@enabled = @new;
+		}
+	}
+}
+
+print("Enabled:");
+foreach my $i (@enabled){
+	print(" $i");
+}
+print("\n");
+
+foreach my $i (@enabled){
+	if($i eq "png"){
+		scan_proj("libpng", "DOPNG");
+	}elsif($i eq "tiff"){
+		scan_proj("libtiff", "DOTIFF");
+	}elsif($i eq "jpeg"){
+		scan_proj("libjpeg", "DOJPEG");
+	}elsif($i eq "gif"){
+		scan_proj("libgif", "DOGIF");
+	}elsif($i eq "xpm"){
+		print OUT ("CFLAGS += -DDOXPM\n");
+		print OUT ("\n");
+	}
+
+}
+
+scan_proj("libz");
+
+close(OUT);

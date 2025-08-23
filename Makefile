@@ -18,7 +18,7 @@ OBJS += src/ds.o src/util.o
 OBJS += src/ui/main.o src/ui/version.o src/ui/image.o src/ui/credits.o
 OBJS += src/format/tiff.o src/format/png.o src/format/jpeg.o src/format/xpm.o src/format/gif.o
 OBJS += src/winview.res
-include deps.mk
+include config.mk
 
 winview.exe: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)

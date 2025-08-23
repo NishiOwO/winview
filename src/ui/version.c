@@ -29,20 +29,20 @@ static const char* texts[] = {
 };
 
 static HBITMAP bufferbmp;
-static HDC bufferdc;
+static HDC     bufferdc;
 
 LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_CLOSE) {
 		EndDialog(hWnd, 0);
 	} else if(msg == WM_KEYDOWN) {
 		if(wp == 'Q' || wp == VK_ESCAPE) EndDialog(hWnd, 0);
-	} else if(msg == WM_DESTROY){
+	} else if(msg == WM_DESTROY) {
 		DeleteDC(bufferdc);
 		DeleteObject(bufferbmp);
 	} else if(msg == WM_INITDIALOG) {
 		RECT r;
-		HDC dc;
-		int i;
+		HDC  dc;
+		int  i;
 		GetWindowRect(hWnd, &r);
 		SetWindowPos(hWnd, NULL, 0, 0, 440, 440 / 4 * 3, SWP_NOMOVE);
 
@@ -52,26 +52,26 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		GetClientRect(hWnd, &r);
 
 		bufferbmp = CreateCompatibleBitmap(dc, r.right - r.left, r.bottom - r.top);
-		bufferdc = CreateCompatibleDC(dc);
+		bufferdc  = CreateCompatibleDC(dc);
 
 		SelectObject(bufferdc, bufferbmp);
 
 		ReleaseDC(hWnd, dc);
 
-		for(i = 0; i < sizeof(stars) / sizeof(stars[0]); i++){
-			stars[i].x = rand() % (r.right - r.left);
-			stars[i].y = rand() % (r.bottom - r.top);
-			stars[i].c = rand() % 256;
+		for(i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
+			stars[i].x     = rand() % (r.right - r.left);
+			stars[i].y     = rand() % (r.bottom - r.top);
+			stars[i].c     = rand() % 256;
 			stars[i].brush = GetSolidBrushCached(stars[i].c, stars[i].c, stars[i].c);
 
 			stars[i].c /= 255;
 		}
 
-		SetTimer(hWnd, 100, 1000/FPS, NULL);
+		SetTimer(hWnd, 100, 1000 / FPS, NULL);
 #endif
-	} else if(msg == WM_ERASEBKGND){
+	} else if(msg == WM_ERASEBKGND) {
 #ifdef USE_STAR
-	} else if(msg == WM_TIMER){
+	} else if(msg == WM_TIMER) {
 		InvalidateRect(hWnd, NULL, FALSE);
 #endif
 	} else if(msg == WM_PAINT) {
@@ -93,10 +93,10 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		PatBlt(dc, 0, 0, ww, wh, BLACKNESS);
 
 #ifdef USE_STAR
-		for(i = 0; i < sizeof(stars) / sizeof(stars[0]); i++){
-			r.left = stars[i].x;
-			r.top = stars[i].y;
-			r.right = r.left + 2;
+		for(i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
+			r.left	 = stars[i].x;
+			r.top	 = stars[i].y;
+			r.right	 = r.left + 2;
 			r.bottom = r.top + 2;
 
 			FillRect(dc, &r, stars[i].brush);

@@ -1,5 +1,6 @@
 #include <wvcommon.h>
 
+#ifdef DOXPM
 typedef struct color {
 	char* key;
 	DWORD value;
@@ -225,3 +226,4 @@ wvimage_t* TryXPMDriver(const char* path) {
 
 	return img;
 }
+#endif

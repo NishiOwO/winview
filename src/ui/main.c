@@ -16,11 +16,21 @@ button_t buttons[] = {
 };
 
 const char* exts[] = {
+#ifdef DOJPEG
     "JPEG", "*.jpg;*.jpeg", /**/
-    "PNG",  "*.png",	    /**/
+#endif
+#ifdef DOPNG
+    "PNG",  "*.png", /**/
+#endif
+#ifdef DOTIFF
     "TIFF", "*.tiff;*.tif", /**/
-    "XPM",  "*.xpm",	    /**/
-    "GIF",  "*.gif",	    /**/
+#endif
+#ifdef DOXPM
+    "XPM",  "*.xpm", /**/
+#endif
+#ifdef DOGIF
+    "GIF",  "*.gif", /**/
+#endif
 };
 char exttext[1024];
 int  extseek = 0;
@@ -40,7 +50,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		}
 		if(m == IDM_VIEW_10_LARGER || m == IDM_VIEW_10_SMALLER) {
 			if(hImage != NULL) {
-				RECT r;
+				RECT   r;
 				int    style;
 				double d = m == IDM_VIEW_10_LARGER ? 1 : -1;
 

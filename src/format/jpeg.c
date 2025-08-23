@@ -1,5 +1,6 @@
 #include <wvcommon.h>
 
+#ifdef DOJPEG
 #include <jpeglib.h>
 #include <jerror.h>
 
@@ -83,3 +84,4 @@ wvimage_t* TryJPEGDriver(const char* path) {
 
 	return img;
 }
+#endif

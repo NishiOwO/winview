@@ -34,24 +34,24 @@ void ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h) {
 
 static brushcache_t* solidcache = NULL;
 
-HBRUSH		     GetSolidBrushCached(int r, int g, int b) {
-	      int	   i;
-	      brushcache_t c;
+HBRUSH GetSolidBrushCached(int r, int g, int b) {
+	int	     i;
+	brushcache_t c;
 
-	      for(i = 0; i < arrlen(solidcache); i++) {
-		      if(solidcache[i].r == r && solidcache[i].g == g && solidcache[i].b == b) {
-			      return solidcache[i].brush;
-		      }
-	      }
+	for(i = 0; i < arrlen(solidcache); i++) {
+		if(solidcache[i].r == r && solidcache[i].g == g && solidcache[i].b == b) {
+			return solidcache[i].brush;
+		}
+	}
 
-	      c.r     = r;
-	      c.g     = g;
-	      c.b     = b;
-	      c.brush = CreateSolidBrush(RGB(r, g, b));
+	c.r	= r;
+	c.g	= g;
+	c.b	= b;
+	c.brush = CreateSolidBrush(RGB(r, g, b));
 
-	      arrput(solidcache, c);
+	arrput(solidcache, c);
 
-	      return c.brush;
+	return c.brush;
 }
 
 static brushcache_t* hatchcache = NULL;

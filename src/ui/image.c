@@ -57,7 +57,23 @@ void QueueImage(const char* path, const char* title) {
 	}
 }
 
-DriverProc* drivers[] = {TryGIFDriver, TryPNGDriver, TryJPEGDriver, TryTIFFDriver, TryXPMDriver};
+DriverProc* drivers[] = {
+#ifdef DOGIF
+    TryGIFDriver,
+#endif
+#ifdef DOPNG
+    TryPNGDriver,
+#endif
+#ifdef DOJPEG
+    TryJPEGDriver,
+#endif
+#ifdef DOTIFF
+    TryTIFFDriver,
+#endif
+#ifdef DOXPM
+    TryXPMDriver
+#endif
+};
 
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_CLOSE) {

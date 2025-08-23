@@ -1,5 +1,6 @@
 #include <wvcommon.h>
 
+#ifdef DOPNG
 #include <png.h>
 
 typedef struct pngopaque {
@@ -75,3 +76,4 @@ wvimage_t* TryPNGDriver(const char* path) {
 
 	return img;
 }
+#endif

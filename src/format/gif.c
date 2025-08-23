@@ -1,5 +1,6 @@
 #include <wvcommon.h>
 
+#ifdef DOGIF
 #include <gif_lib.h>
 
 typedef struct gifopaque {
@@ -154,3 +155,4 @@ wvimage_t* TryGIFDriver(const char* path) {
 
 	return img;
 }
+#endif

@@ -1,5 +1,6 @@
 #include <wvcommon.h>
 
+#ifdef DOTIFF
 #include <tiffio.h>
 
 typedef struct tiffopaque {
@@ -75,3 +76,4 @@ wvimage_t* TryTIFFDriver(const char* path) {
 
 	return img;
 }
+#endif
