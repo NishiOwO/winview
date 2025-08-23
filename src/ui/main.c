@@ -50,17 +50,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		}
 		if(m == IDM_VIEW_10_LARGER || m == IDM_VIEW_10_SMALLER) {
 			if(hImage != NULL) {
-				RECT   r;
-				int    style;
-				double d = m == IDM_VIEW_10_LARGER ? 1 : -1;
-
-				GetClientRect(hImage, &r);
-				r.right += 0.1 * (r.right - r.left) * d;
-				r.bottom += 0.1 * (r.bottom - r.top) * d;
-
-				style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
-				AdjustWindowRect(&r, style, FALSE);
-				SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+				ScaleImage(m == IDM_VIEW_10_LARGER ? 1 : -1);
 			}
 		}
 		if(m == IDM_ABOUT_CREDITS) DialogBox(hInst, "WVCREDITS", hWnd, (DLGPROC)CreditsDialog);
@@ -98,27 +88,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 				LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
 				if(s != LB_ERR) DeleteImage(s);
 			} else if(id == 'P') {
-				LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
-				LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
-				if(c <= 0) {
-				} else if(s == LB_ERR) {
-					SendMessage(hListbox, LB_SETCURSEL, 0, 0);
-					ShowImage(0);
-				} else if(s > 0) {
-					SendMessage(hListbox, LB_SETCURSEL, s - 1, 0);
-					ShowImage(s - 1);
-				}
+				PreviousImage();
 			} else if(id == 'N') {
-				LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
-				LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
-				if(c <= 0) {
-				} else if(s == LB_ERR) {
-					SendMessage(hListbox, LB_SETCURSEL, c - 1, 0);
-					ShowImage(0);
-				} else if(s < (c - 1)) {
-					SendMessage(hListbox, LB_SETCURSEL, s + 1, 0);
-					ShowImage(s + 1);
-				}
+				NextImage();
 			}
 		}
 	} else if(msg == WM_CLOSE) {

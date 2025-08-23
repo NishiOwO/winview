@@ -86,5 +86,8 @@ void	    QueueImage(const char* path, const char* title);
 void	    ShowImage(int index);
 void	    DeleteImage(int index);
 BOOL	    InitImageClass(void);
+void PreviousImage(void);
+void NextImage(void);
+void ScaleImage(double d);
 
 #endif

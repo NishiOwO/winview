@@ -79,6 +79,24 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_CLOSE) {
 		hImage = NULL;
 		DestroyWindow(hWnd);
+	} else if(msg == WM_CHAR){
+		if(wp == '+'){
+			ScaleImage(1);
+		}else if(wp == '-'){
+			ScaleImage(-1);
+		}
+	} else if(msg == WM_KEYDOWN){
+		if(wp == VK_ADD){
+			ScaleImage(1);
+		}else if(wp == VK_SUBTRACT){
+			ScaleImage(-1);
+		}else if(wp == VK_PRIOR){
+			/* Page Up */
+			PreviousImage();
+		}else if(wp == VK_NEXT){
+			/* Page Down */
+			NextImage();
+		}
 	} else if(msg == WM_PAINT) {
 		PAINTSTRUCT ps;
 		RECT	    r;
@@ -371,4 +389,43 @@ void DeleteImage(int index) {
 		SendMessage(hListbox, LB_SETCURSEL, ind, 0);
 		ShowImage(ind);
 	}
+}
+
+void PreviousImage(void){
+	LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
+	LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
+	if(c <= 0) {
+	} else if(s == LB_ERR) {
+		SendMessage(hListbox, LB_SETCURSEL, 0, 0);
+		ShowImage(0);
+	} else if(s > 0) {
+		SendMessage(hListbox, LB_SETCURSEL, s - 1, 0);
+		ShowImage(s - 1);
+	}
+}
+
+void NextImage(void){
+	LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
+	LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
+	if(c <= 0) {
+	} else if(s == LB_ERR) {
+		SendMessage(hListbox, LB_SETCURSEL, c - 1, 0);
+		ShowImage(0);
+	} else if(s < (c - 1)) {
+		SendMessage(hListbox, LB_SETCURSEL, s + 1, 0);
+		ShowImage(s + 1);
+	}
+}
+
+void ScaleImage(double d){
+	RECT   r;
+	int    style;
+
+	GetClientRect(hImage, &r);
+	r.right += 0.1 * (r.right - r.left) * d;
+	r.bottom += 0.1 * (r.bottom - r.top) * d;
+
+	style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
+	AdjustWindowRect(&r, style, FALSE);
+	SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
 }
