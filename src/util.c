@@ -199,3 +199,25 @@ DWORD ParseHex(const char* str, int len) {
 	}
 	return n;
 }
+
+WORD ReadAsWORD(unsigned char* ptr, int start) {
+	WORD r = 0;
+	int  i;
+	for(i = 1; i >= 0; i--) {
+		r = r << 8;
+		r = r | ptr[start + i];
+	}
+
+	return r;
+}
+
+DWORD ReadAsDWORD(unsigned char* ptr, int start) {
+	DWORD r = 0;
+	int   i;
+	for(i = 3; i >= 0; i--) {
+		r = r << 8;
+		r = r | ptr[start + i];
+	}
+
+	return r;
+}

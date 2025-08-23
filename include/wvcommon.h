@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+#include <ctype.h>
 #include <sys/stat.h>
 
 enum WM_USERS {
@@ -31,10 +32,18 @@ typedef struct wvimage {
 	FILE*	      fp;
 	const char*   name;
 	unsigned char type;
+	unsigned char direction; /* 0 for up-to-down, 1 for down-to-up */
 	void (*close)(void* ptr);
 	unsigned char* (*read)(void* ptr);
 } wvimage_t;
 typedef wvimage_t*(DriverProc)(const char* path);
+
+typedef struct RGBAPack_ {
+	unsigned char red;
+	unsigned char blue;
+	unsigned char green;
+	unsigned char alpha;
+} RGBAPack;
 
 #define Allocate(var) \
 	var = malloc(sizeof(*var)); \
@@ -47,6 +56,7 @@ wvimage_t* TryPNGDriver(const char* path);
 wvimage_t* TryTIFFDriver(const char* path);
 wvimage_t* TryXPMDriver(const char* path);
 wvimage_t* TryGIFDriver(const char* path);
+wvimage_t* TryTGADriver(const char* path);
 
 /* main.c */
 extern HINSTANCE hInst;
@@ -77,6 +87,8 @@ void	   CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
 void	   ReadyStatus(void);
 void	   AdjustImageWindowSize(void);
 DWORD	   ParseHex(const char* str, int len);
+WORD	   ReadAsWORD(unsigned char* ptr, int start);
+DWORD	   ReadAsDWORD(unsigned char* ptr, int start);
 
 /* image.c */
 extern HWND hImage;
@@ -86,8 +98,8 @@ void	    QueueImage(const char* path, const char* title);
 void	    ShowImage(int index);
 void	    DeleteImage(int index);
 BOOL	    InitImageClass(void);
-void PreviousImage(void);
-void NextImage(void);
-void ScaleImage(double d);
+void	    PreviousImage(void);
+void	    NextImage(void);
+void	    ScaleImage(double d);
 
 #endif

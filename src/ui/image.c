@@ -71,7 +71,10 @@ DriverProc* drivers[] = {
     TryTIFFDriver,
 #endif
 #ifdef DOXPM
-    TryXPMDriver
+    TryXPMDriver,
+#endif
+#ifdef DOTGA
+    TryTGADriver
 #endif
 };
 
@@ -79,21 +82,21 @@ LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_CLOSE) {
 		hImage = NULL;
 		DestroyWindow(hWnd);
-	} else if(msg == WM_CHAR){
-		if(wp == '+'){
+	} else if(msg == WM_CHAR) {
+		if(wp == '+') {
 			ScaleImage(1);
-		}else if(wp == '-'){
+		} else if(wp == '-') {
 			ScaleImage(-1);
 		}
-	} else if(msg == WM_KEYDOWN){
-		if(wp == VK_ADD){
+	} else if(msg == WM_KEYDOWN) {
+		if(wp == VK_ADD) {
 			ScaleImage(1);
-		}else if(wp == VK_SUBTRACT){
+		} else if(wp == VK_SUBTRACT) {
 			ScaleImage(-1);
-		}else if(wp == VK_PRIOR){
+		} else if(wp == VK_PRIOR) {
 			/* Page Up */
 			PreviousImage();
-		}else if(wp == VK_NEXT){
+		} else if(wp == VK_NEXT) {
 			/* Page Down */
 			NextImage();
 		}
@@ -213,7 +216,9 @@ DWORD WINAPI ImageThread(LPVOID param) {
 	image->height = wvimg->height;
 	CreateWinViewBitmap(wvimg->width, wvimg->height, &bmp, &quad);
 	if(wvimg->type == WVIMAGE_READ_ROW) {
-		for(i = 0; i < wvimg->height; i++) {
+		int progress = 0;
+
+		for(i = (wvimg->direction == 0 ? 0 : (wvimg->height - 1)); (wvimg->direction == 0 ? (i < wvimg->height) : (i >= 0)); i += (wvimg->direction == 0 ? 1 : -1)) {
 			unsigned char* row;
 			int	       j;
 			if(image->go_sleep) {
@@ -228,7 +233,7 @@ DWORD WINAPI ImageThread(LPVOID param) {
 
 			LockWinViewMutex(mutex);
 			if(shown == image) {
-				SetProgress((double)i / wvimg->height * 100);
+				SetProgress((double)progress / wvimg->height * 100);
 			}
 			UnlockWinViewMutex(mutex);
 
@@ -253,6 +258,8 @@ DWORD WINAPI ImageThread(LPVOID param) {
 				px->rgbReserved = 0;
 			}
 			free(row);
+
+			progress++;
 		}
 	} else if(wvimg->type == WVIMAGE_READ_FRAME) {
 		unsigned char* d = wvimg->read(wvimg);
@@ -391,7 +398,7 @@ void DeleteImage(int index) {
 	}
 }
 
-void PreviousImage(void){
+void PreviousImage(void) {
 	LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
 	LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
 	if(c <= 0) {
@@ -404,7 +411,7 @@ void PreviousImage(void){
 	}
 }
 
-void NextImage(void){
+void NextImage(void) {
 	LRESULT s = SendMessage(hListbox, LB_GETCURSEL, 0, 0);
 	LRESULT c = SendMessage(hListbox, LB_GETCOUNT, 0, 0);
 	if(c <= 0) {
@@ -417,9 +424,9 @@ void NextImage(void){
 	}
 }
 
-void ScaleImage(double d){
-	RECT   r;
-	int    style;
+void ScaleImage(double d) {
+	RECT r;
+	int  style;
 
 	GetClientRect(hImage, &r);
 	r.right += 0.1 * (r.right - r.left) * d;
