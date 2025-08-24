@@ -82,6 +82,7 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		int	    x, y;
 		int	    i;
 		int	    vw;
+		int	    savy;
 
 		GetClientRect(hWnd, &r);
 		wh = r.bottom - r.top;
@@ -114,7 +115,7 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 		y = 10;
 		for(i = 0; texts[i] != NULL; i++) {
-			y += texts[i][0] == '+' ? 14 * 5 : 14;
+			y += texts[i][0] == '+' ? 14 * 7.5 : 14;
 		}
 
 		r.left	 = 0;
@@ -143,9 +144,17 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 			sprintf(t, texts[i] + ((texts[i][0] == '+' || texts[i][0] == '-') ? 1 : 0), wvversion);
 
+			if(texts[i][0] == '+') savy = y;
 			TextOut(dc, ww / 2, wh - y, t, strlen(t));
-			y += texts[i][0] == '+' ? 14 * 5 : 14;
+			y += texts[i][0] == '+' ? 14 * 7.5 : 14;
 		}
+
+#ifdef BETA
+		SetTextColor(dc, RGB(0xe0, 0, 0));
+		SelectObject(dc, betafont);
+
+		TextOut(dc, ww / 2, wh - savy - (14 * 7.5 - 14 * 3) / 2, "BETA VERSION", 4 + 1 + 7);
+#endif
 
 		dc = BeginPaint(hWnd, &ps);
 		SetStretchBltMode(dc, HALFTONE);

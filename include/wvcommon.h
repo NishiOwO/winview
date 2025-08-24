@@ -13,6 +13,9 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
+/* currently */
+#define BETA
+
 enum WM_USERS {
 	WM_TERMINATE_ME = WM_USER,
 	WM_SB_SETTEXT,
@@ -60,8 +63,7 @@ wvimage_t* TryTGADriver(const char* path);
 
 /* main.c */
 extern HINSTANCE hInst;
-extern HFONT	 fixedsys;
-extern HFONT	 bifixedsys;
+extern HFONT	 fixedsys, bifixedsys, betafont;
 extern HWND	 hMain, hStatus, hProgress, hListbox;
 
 /* version.c */

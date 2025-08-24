@@ -40,7 +40,7 @@ int  extseek = 0;
 
 HWND	  hMain, hStatus, hProgress, hListbox;
 HINSTANCE hInst;
-HFONT	  fixedsys, bifixedsys;
+HFONT	  fixedsys, bifixedsys, betafont;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_COMMAND) {
@@ -288,7 +288,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	InitCommonControls();
 
 	fixedsys   = CreateFont(14, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
-	bifixedsys = CreateFont(14 * 5, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
+	bifixedsys = CreateFont(14 * 7.5, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
+	betafont   = CreateFont(14 * 3, 0, 112, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, NULL);
 
 	if(!InitWindow(nCmdShow)) {
 		return FALSE;
@@ -311,6 +312,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			fclose(f);
 		}
 	}
+
+	DialogBox(hInst, "WVVERSION", hMain, (DLGPROC)VersionDialog);
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0) {
 		if(bret == -1) break;

@@ -12,6 +12,7 @@ This release supports following formats:
 
 with following features:
  - Re-Aspect
+ - Scaling
 
 Compiling
 ---------
