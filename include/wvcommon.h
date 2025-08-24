@@ -12,6 +12,7 @@
 #include <setjmp.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <math.h>
 
 /* currently */
 #define BETA
@@ -96,6 +97,7 @@ DWORD	   ReadAsLittleDWORD(unsigned char* ptr, int start);
 WORD	   ReadAsBigWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsBigDWORD(unsigned char* ptr, int start);
 BOOL	   CompareStringSafely(const char* target, const char* comp); /* search for comp on target */
+double CeilNumber(double n);
 
 /* image.c */
 extern HWND hImage;
@@ -108,5 +110,8 @@ BOOL	    InitImageClass(void);
 void	    PreviousImage(void);
 void	    NextImage(void);
 void	    ScaleImage(double d);
+
+/* font.c */
+void Draw8x8Text(HDC dc, const char* str, int x, int y, double scale, int r, int g, int b);
 
 #endif

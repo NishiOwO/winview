@@ -37,7 +37,7 @@ const char* exts[] = {
     "*.gif", /**/
 #endif
 #ifdef DOMSP
-    "MSPaint (Windows 1.x/2.x Paint)",
+    "MSPaint",
     "*.msp", /**/
 #endif
 #ifdef DOTGA
@@ -326,6 +326,8 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			fclose(f);
 		}
 	}
+
+DialogBox(hInst, "WVVERSION", hMain, (DLGPROC)VersionDialog);
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0) {
 		if(bret == -1) break;

@@ -1,9 +1,9 @@
 #include <wvcommon.h>
 #include <wvresource.h>
 
-#define USE_STAR
+#define GOOD_ONE
 
-#ifdef USE_STAR
+#ifdef GOOD_ONE
 #define FPS 30
 
 typedef struct star {
@@ -14,6 +14,7 @@ typedef struct star {
 } star_t;
 
 static star_t stars[256];
+static double passed = 0;
 #endif
 
 const char* wvversion = "0.0";
@@ -43,10 +44,11 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		RECT r;
 		HDC  dc;
 		int  i;
+
 		GetWindowRect(hWnd, &r);
 		SetWindowPos(hWnd, NULL, 0, 0, 440, 440 / 4 * 3, SWP_NOMOVE);
 
-#ifdef USE_STAR
+#ifdef GOOD_ONE
 		dc = GetDC(hWnd);
 
 		GetClientRect(hWnd, &r);
@@ -67,10 +69,12 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 			stars[i].c /= 255;
 		}
 
+		passed = 0;
+
 		SetTimer(hWnd, 100, 1000 / FPS, NULL);
 #endif
 	} else if(msg == WM_ERASEBKGND) {
-#ifdef USE_STAR
+#ifdef GOOD_ONE
 	} else if(msg == WM_TIMER) {
 		InvalidateRect(hWnd, NULL, FALSE);
 #endif
@@ -93,7 +97,7 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 		PatBlt(dc, 0, 0, ww, wh, BLACKNESS);
 
-#ifdef USE_STAR
+#ifdef GOOD_ONE
 		for(i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
 			r.left	 = stars[i].x;
 			r.top	 = stars[i].y;
@@ -105,6 +109,8 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 			stars[i].x -= (double)ww / FPS * stars[i].c / 4;
 			if(stars[i].x <= -2) stars[i].x = ww + stars[i].x + 2;
 		}
+
+		passed += 1.0 / FPS;
 #else
 		/* 200x138 */
 		for(y = 0; y < (wh / 138) + 1; y++) {
