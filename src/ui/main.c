@@ -31,6 +31,9 @@ const char* exts[] = {
 #ifdef DOGIF
     "GIF",  "*.gif", /**/
 #endif
+#ifdef DOTGA
+    "TGA",  "*.tga", /**/
+#endif
 };
 char exttext[1024];
 int  extseek = 0;
