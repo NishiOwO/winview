@@ -76,8 +76,11 @@ DriverProc* drivers[] = {
 #ifdef DOMSP
     TryMSPDriver,
 #endif
+#ifdef DOXBM
+    TryXBMDriver,
+#endif
 #ifdef DOTGA
-    TryTGADriver
+    TryTGADriver,
 #endif
 };
 
@@ -197,6 +200,7 @@ DWORD WINAPI ImageThread(LPVOID param) {
 	UnlockWinViewMutex(mutex);
 
 	for(i = 0; i < sizeof(drivers) / sizeof(drivers[0]); i++) {
+		if(drivers[i] == NULL) continue;
 		wvimg = drivers[i](image->path);
 
 		if(wvimg != NULL) break;

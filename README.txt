@@ -8,6 +8,7 @@ This release supports following formats:
  - XPM
  - TGA
  - MSPaint
+ - XBM
  - BMP (TODO)
  - GIF (no animations yet)
 

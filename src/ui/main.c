@@ -44,6 +44,10 @@ const char* exts[] = {
     "TGA",
     "*.tga", /**/
 #endif
+#ifdef DOXBM
+    "XBM",
+    "*.xbm", /**/
+#endif
 };
 char exttext[1024];
 int  extseek = 0;

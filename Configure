@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-my @all = ("png", "jpeg", "tiff", "gif", "xpm", "tga", "bmp", "msp");
+my @all = ("png", "jpeg", "tiff", "gif", "xpm", "tga", "bmp", "msp", "xbm");
 my @enabled = ();
 foreach my $i (@all){
 	push(@enabled, $i);

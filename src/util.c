@@ -243,3 +243,13 @@ DWORD ReadAsBigDWORD(unsigned char* ptr, int start) {
 
 	return r;
 }
+
+BOOL CompareStringSafely(const char* target, const char* comp) {
+	int i;
+	for(i = 0; comp[i] != 0; i++) {
+		if(target[i] == 0) return FALSE;
+		if(target[i] != comp[i]) return FALSE;
+	}
+
+	return TRUE;
+}

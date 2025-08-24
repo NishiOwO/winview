@@ -60,6 +60,7 @@ wvimage_t* TryTIFFDriver(const char* path);
 wvimage_t* TryXPMDriver(const char* path);
 wvimage_t* TryGIFDriver(const char* path);
 wvimage_t* TryMSPDriver(const char* path);
+wvimage_t* TryXBMDriver(const char* path);
 wvimage_t* TryTGADriver(const char* path);
 
 /* main.c */
@@ -94,6 +95,7 @@ WORD	   ReadAsLittleWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsLittleDWORD(unsigned char* ptr, int start);
 WORD	   ReadAsBigWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsBigDWORD(unsigned char* ptr, int start);
+BOOL	   CompareStringSafely(const char* target, const char* comp); /* search for comp on target */
 
 /* image.c */
 extern HWND hImage;
