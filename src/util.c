@@ -254,7 +254,7 @@ BOOL CompareStringSafely(const char* target, const char* comp) {
 	return TRUE;
 }
 
-double CeilNumber(double n){
+double CeilNumber(double n) {
 	if(n == (int)n) return n;
 	if(n > 0) return 1 + (int)n;
 	if(n < 0) return -1 + (int)n;

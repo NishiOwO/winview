@@ -17,36 +17,28 @@ button_t buttons[] = {
 
 const char* exts[] = {
 #ifdef DOJPEG
-    "JPEG",
-    "*.jpg;*.jpeg", /**/
+    "JPEG",    "*.jpg;*.jpeg", /**/
 #endif
 #ifdef DOPNG
-    "PNG",
-    "*.png", /**/
+    "PNG",     "*.png", /**/
 #endif
 #ifdef DOTIFF
-    "TIFF",
-    "*.tiff;*.tif", /**/
+    "TIFF",    "*.tiff;*.tif", /**/
 #endif
 #ifdef DOGIF
-    "GIF",
-    "*.gif", /**/
+    "GIF",     "*.gif", /**/
 #endif
 #ifdef DOMSP
-    "MSPaint",
-    "*.msp", /**/
+    "MSPaint", "*.msp", /**/
 #endif
 #ifdef DOTGA
-    "TGA",
-    "*.tga", /**/
+    "TGA",     "*.tga", /**/
 #endif
 #ifdef DOXBM
-    "XBM",
-    "*.xbm", /**/
+    "XBM",     "*.xbm", /**/
 #endif
 #ifdef DOXPM
-    "XPM",
-    "*.xpm", /**/
+    "XPM",     "*.xpm", /**/
 #endif
 };
 char exttext[1024];

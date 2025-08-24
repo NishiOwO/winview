@@ -97,7 +97,7 @@ DWORD	   ReadAsLittleDWORD(unsigned char* ptr, int start);
 WORD	   ReadAsBigWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsBigDWORD(unsigned char* ptr, int start);
 BOOL	   CompareStringSafely(const char* target, const char* comp); /* search for comp on target */
-double CeilNumber(double n);
+double	   CeilNumber(double n);
 
 /* image.c */
 extern HWND hImage;
