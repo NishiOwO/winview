@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-my @all = ("png", "jpeg", "tiff", "gif", "xpm", "tga", "bmp");
+my @all = ("png", "jpeg", "tiff", "gif", "xpm", "tga", "bmp", "msp");
 my @enabled = ();
 foreach my $i (@all){
 	push(@enabled, $i);
@@ -86,7 +86,7 @@ foreach my $i (@enabled){
 		scan_proj("libjpeg", "DOJPEG");
 	}elsif($i eq "gif"){
 		scan_proj("libgif", "DOGIF");
-	}elsif(($i eq "xpm") or ($i eq "bmp") or ($i eq "tga")){
+	}else{
 		print OUT ("CFLAGS += -DDO" . uc($i) . "\n");
 		print OUT ("\n");
 	}

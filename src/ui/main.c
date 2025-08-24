@@ -17,22 +17,32 @@ button_t buttons[] = {
 
 const char* exts[] = {
 #ifdef DOJPEG
-    "JPEG", "*.jpg;*.jpeg", /**/
+    "JPEG",
+    "*.jpg;*.jpeg", /**/
 #endif
 #ifdef DOPNG
-    "PNG",  "*.png", /**/
+    "PNG",
+    "*.png", /**/
 #endif
 #ifdef DOTIFF
-    "TIFF", "*.tiff;*.tif", /**/
+    "TIFF",
+    "*.tiff;*.tif", /**/
 #endif
 #ifdef DOXPM
-    "XPM",  "*.xpm", /**/
+    "XPM",
+    "*.xpm", /**/
 #endif
 #ifdef DOGIF
-    "GIF",  "*.gif", /**/
+    "GIF",
+    "*.gif", /**/
+#endif
+#ifdef DOMSP
+    "MSPaint (Windows 1.x/2.x Paint)",
+    "*.msp", /**/
 #endif
 #ifdef DOTGA
-    "TGA",  "*.tga", /**/
+    "TGA",
+    "*.tga", /**/
 #endif
 };
 char exttext[1024];
@@ -312,8 +322,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 			fclose(f);
 		}
 	}
-
-	DialogBox(hInst, "WVVERSION", hMain, (DLGPROC)VersionDialog);
 
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0) {
 		if(bret == -1) break;

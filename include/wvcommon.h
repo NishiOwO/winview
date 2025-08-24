@@ -59,6 +59,7 @@ wvimage_t* TryPNGDriver(const char* path);
 wvimage_t* TryTIFFDriver(const char* path);
 wvimage_t* TryXPMDriver(const char* path);
 wvimage_t* TryGIFDriver(const char* path);
+wvimage_t* TryMSPDriver(const char* path);
 wvimage_t* TryTGADriver(const char* path);
 
 /* main.c */

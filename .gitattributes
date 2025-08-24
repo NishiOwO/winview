@@ -8,5 +8,5 @@
 /external/libz/include/*.h linguist-generated
 /external/libgif/src/*.c linguist-generated
 /external/libgif/include/*.h linguist-generated
-/deps.mk linguist-generated
+/config.mk linguist-generated
 /include/stb_ds.h linguist-generated

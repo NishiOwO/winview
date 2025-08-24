@@ -73,6 +73,9 @@ DriverProc* drivers[] = {
 #ifdef DOXPM
     TryXPMDriver,
 #endif
+#ifdef DOMSP
+    TryMSPDriver,
+#endif
 #ifdef DOTGA
     TryTGADriver
 #endif
