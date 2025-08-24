@@ -327,8 +327,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 		}
 	}
 
-DialogBox(hInst, "WVVERSION", hMain, (DLGPROC)VersionDialog);
-
 	while((bret = GetMessage(&msg, NULL, 0, 0)) != 0) {
 		if(bret == -1) break;
 		TranslateMessage(&msg);
