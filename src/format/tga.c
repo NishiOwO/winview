@@ -36,7 +36,7 @@ static void ReadColor(FILE* fp, int bits, RGBAPack* q) {
 		WORD	      w;
 
 		fread(&rgb[0], 1, 2, fp);
-		w = ReadAsWORD(rgb, 0);
+		w = ReadAsLittleWORD(rgb, 0);
 
 		q->red	 = (double)((w >> 10) & 31) / 31 * 255;
 		q->green = (double)((w >> 5) & 31) / 31 * 255;
@@ -53,7 +53,7 @@ static RGBAPack* GetColorMap(wvimage_t* img) {
 	if(opaque->image_bits == 16) {
 		fread(&d[0], 2, 1, img->fp);
 
-		index = ReadAsWORD(d, 0);
+		index = ReadAsLittleWORD(d, 0);
 	} else if(opaque->image_bits == 8) {
 		fread(&d[0], 1, 1, img->fp);
 
@@ -168,13 +168,13 @@ static void TGADriverClose(void* ptr) {
 }
 
 wvimage_t* TryTGADriver(const char* path) {
-	FILE*	       f = fopen(path, "rb");
-	wvimage_t*     img;
-	tgaopaque_t*   opaque;
-	char*	       ext;
-	int	       i;
-	unsigned char* header;
-	int	       color_bits;
+	FILE*	      f = fopen(path, "rb");
+	wvimage_t*    img;
+	tgaopaque_t*  opaque;
+	char*	      ext;
+	int	      i;
+	unsigned char header[18];
+	int	      color_bits;
 	if(f == NULL) return NULL;
 
 	/**
@@ -193,17 +193,14 @@ wvimage_t* TryTGADriver(const char* path) {
 		}
 	}
 
-	header = malloc(18);
 	if(fread(header, 1, 18, f) < 18) {
 		fclose(f);
-		free(header);
 		return NULL;
 	}
 
 	/* more supports appreciated */
 	if(!(1 <= header[2] && header[2] <= 10)) {
 		fclose(f);
-		free(header);
 		return NULL;
 	}
 
@@ -216,16 +213,16 @@ wvimage_t* TryTGADriver(const char* path) {
 	img->fp	    = f;
 	img->opaque = Allocate(opaque);
 
-	img->width  = ReadAsWORD(header, 12);
-	img->height = ReadAsWORD(header, 14);
+	img->width  = ReadAsLittleWORD(header, 12);
+	img->height = ReadAsLittleWORD(header, 14);
 
 	img->direction = (header[17] & (1 << 5)) ? 0 : 1;
 
 	color_bits	     = header[7];
 	opaque->type	     = header[2];
 	opaque->rle	     = (header[2] == 9 || header[2] == 10) ? TRUE : FALSE;
-	opaque->color_origin = ReadAsWORD(header, 3);
-	opaque->color_length = ReadAsWORD(header, 5);
+	opaque->color_origin = ReadAsLittleWORD(header, 3);
+	opaque->color_length = ReadAsLittleWORD(header, 5);
 	opaque->color_map    = NULL;
 	opaque->image_bits   = header[16];
 	opaque->color_stack  = NULL;
@@ -240,8 +237,6 @@ wvimage_t* TryTGADriver(const char* path) {
 	for(i = 0; i < opaque->color_length; i++) {
 		ReadColor(f, color_bits, &opaque->color_map[i]);
 	}
-
-	free(header);
 
 	return img;
 }

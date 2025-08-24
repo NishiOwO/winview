@@ -7,7 +7,7 @@ This release supports following formats:
  - TIFF
  - XPM
  - TGA
- - MSPaint (TODO)
+ - MSPaint
  - BMP (TODO)
  - GIF (no animations yet)
 

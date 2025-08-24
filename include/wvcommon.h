@@ -90,8 +90,10 @@ void	   CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
 void	   ReadyStatus(void);
 void	   AdjustImageWindowSize(void);
 DWORD	   ParseHex(const char* str, int len);
-WORD	   ReadAsWORD(unsigned char* ptr, int start);
-DWORD	   ReadAsDWORD(unsigned char* ptr, int start);
+WORD	   ReadAsLittleWORD(unsigned char* ptr, int start);
+DWORD	   ReadAsLittleDWORD(unsigned char* ptr, int start);
+WORD	   ReadAsBigWORD(unsigned char* ptr, int start);
+DWORD	   ReadAsBigDWORD(unsigned char* ptr, int start);
 
 /* image.c */
 extern HWND hImage;
