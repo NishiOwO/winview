@@ -28,10 +28,6 @@ const char* exts[] = {
     "TIFF",
     "*.tiff;*.tif", /**/
 #endif
-#ifdef DOXPM
-    "XPM",
-    "*.xpm", /**/
-#endif
 #ifdef DOGIF
     "GIF",
     "*.gif", /**/
@@ -47,6 +43,10 @@ const char* exts[] = {
 #ifdef DOXBM
     "XBM",
     "*.xbm", /**/
+#endif
+#ifdef DOXPM
+    "XPM",
+    "*.xpm", /**/
 #endif
 };
 char exttext[1024];
