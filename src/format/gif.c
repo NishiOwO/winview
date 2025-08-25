@@ -15,13 +15,14 @@ static unsigned char* GIFDriverRead(void* ptr) {
 	wvimage_t*     img    = ptr;
 	gifopaque_t*   opaque = img->opaque;
 	unsigned char* row;
+	int i;
 
 	if(opaque->y >= img->height) return NULL;
 
 	row = malloc(img->width * 4);
 	memset(row, 0, img->width * 4);
 
-	for(int i = 0; i <= FRAME_NUM; i++) {
+	for(i = 0; i <= FRAME_NUM; i++) {
 		SavedImage*	image	   = &opaque->file->SavedImages[i];
 		GifImageDesc*	image_desc = &image->ImageDesc;
 		ColorMapObject* color_map  = opaque->file->SColorMap;
