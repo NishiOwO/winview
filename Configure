@@ -16,10 +16,10 @@ sub scan_proj {
 	foreach my $fn (@files){
 		if(($fn eq ".") || ($fn eq "..")){
 			next;
+		}elsif($fn =~ /\.c$/){
+			$fn =~ s/\.c$/.o/;
+			print OUT (" external/$_[0]/src/$fn");
 		}
-
-		$fn =~ s/\.c$/.o/;
-		print OUT (" external/$_[0]/src/$fn");
 	}
 
 	closedir($dh);

@@ -25,7 +25,7 @@ void GifQprintf(char *Format, ...) {
 
 	if (GifNoisyPrint) {
 		char Line[128];
-		(void)vsnprintf(Line, sizeof(Line), Format, ArgPtr);
+		(void)vsprintf(Line, Format, ArgPtr);
 		(void)fputs(Line, stderr);
 	}
 

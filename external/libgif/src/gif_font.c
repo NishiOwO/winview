@@ -248,7 +248,7 @@ void GifDrawBoxedText8x8(SavedImage *Image, const int x, const int y,
 			GifDrawText8x8(
 			    Image, x + border + (leadspace * GIF_FONT_WIDTH),
 			    y + border + (GIF_FONT_HEIGHT * i++), cp, fg);
-			cp = strtok_r(NULL, "\r\n", &lasts);
+			cp = GifStrtok(NULL, "\r\n", &lasts);
 		} while (cp);
 		(void)free((void *)dup);
 
