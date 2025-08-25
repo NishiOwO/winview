@@ -128,7 +128,9 @@ LRESULT CALLBACK VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 			y += fsz;
 		}
 
-		Draw8x8Text(dc, "BETA VERSION", 11.25, ww / 2, wh - savy - (14 * 4) / 2, 22.0 / 8, 0xff, 0, 0);
+#ifdef BETA
+		Draw8x8Text(dc, "BETA VERSION", sin(passed * M_PI * 1) * 11.25, ww / 2, wh - savy - (14 * 4) / 2, 22.0 / 8, 0xff, 0, 0);
+#endif
 
 		dc = BeginPaint(hWnd, &ps);
 		SetStretchBltMode(dc, HALFTONE);
