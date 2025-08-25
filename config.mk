@@ -16,7 +16,7 @@ OBJS += external/libtiff.a
 external/libtiff.a: $(LIBTIFF_OBJS)
 	$(AR) rcs $@ $(LIBTIFF_OBJS)
 
-LIBGIF_OBJS = external/libgif/src/dgif_lib.o external/libgif/src/egif_lib.o external/libgif/src/gif_err.o external/libgif/src/gif_font.o external/libgif/src/gif_err.o external/libgif/src/gif_font.o external/libgif/src/gif_hash.o external/libgif/src/gifalloc.o external/libgif/src/egif_lib.o external/libgif/src/openbsd-reallocarray.o external/libgif/src/qprintf.o external/libgif/src/gif_hash.o external/libgif/src/gifalloc.o external/libgif/src/quantize.o external/libgif/src/dgif_lib.o external/libgif/src/openbsd-reallocarray.o external/libgif/src/qprintf.o external/libgif/src/quantize.o
+LIBGIF_OBJS = external/libgif/src/dgif_lib.o external/libgif/src/egif_lib.o external/libgif/src/gif_err.o external/libgif/src/gif_font.o external/libgif/src/gif_err.o external/libgif/src/gif_font.o external/libgif/src/gif_hash.o external/libgif/src/gifalloc.o external/libgif/src/egif_lib.o external/libgif/src/openbsd-reallocarray.o external/libgif/src/qprintf.o external/libgif/src/gif_hash.o external/libgif/src/gifalloc.o external/libgif/src/quantize.o external/libgif/src/dgif_lib.o external/libgif/src/strtok_r.o external/libgif/src/qprintf.o external/libgif/src/openbsd-reallocarray.o external/libgif/src/quantize.o
 CFLAGS += -Iexternal/libgif/include -DDOGIF
 OBJS += external/libgif.a
 external/libgif.a: $(LIBGIF_OBJS)

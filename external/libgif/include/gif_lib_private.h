@@ -72,6 +72,8 @@ extern void *openbsd_reallocarray(void *optr, size_t nmemb, size_t size);
 #define reallocarray openbsd_reallocarray
 #endif
 
+extern char* GifStrtok(char *s, const char *delim, char **lasts);
+
 #endif /* _GIF_LIB_PRIVATE_H */
 
 /* end */

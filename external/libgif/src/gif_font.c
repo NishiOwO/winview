@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 #include <string.h>
 
 #include "gif_lib.h"
+#include "gif_lib_private.h"
 
 /*****************************************************************************
  Ascii 8 by 8 regular font - only first 128 characters are supported.
@@ -236,7 +237,7 @@ void GifDrawBoxedText8x8(SavedImage *Image, const int x, const int y,
 		    border + TextWidth * GIF_FONT_WIDTH + border - 1,
 		    border + LineCount * GIF_FONT_HEIGHT + border - 1, bg);
 		(void)strcpy(dup, (char *)legend);
-		cp = strtok_r(dup, "\r\n", &lasts);
+		cp = GifStrtok(dup, "\r\n", &lasts);
 		do {
 			int leadspace = 0;
 

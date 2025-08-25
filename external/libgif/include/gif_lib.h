@@ -41,6 +41,7 @@ typedef unsigned char GifBool;
 #define GIF_ERROR 0
 #define GIF_OK 1
 
+#include <stdio.h>
 #include <stddef.h>
 
 #define GIF_STAMP "GIFVER" /* First chars in file - GIF stamp.  */
@@ -176,7 +177,7 @@ int EGifPutImageDesc(GifFileType *GifFile, const int GifLeft, const int GifTop,
                      const ColorMapObject *GifColorMap);
 void EGifSetGifVersion(GifFileType *GifFile, const GifBool gif89);
 int EGifPutLine(GifFileType *GifFile, GifPixelType *GifLine, int GifLineLen);
-int EGifPutPixel(GifFileType *GifFile, const GifPixelType GifPixel);
+int EGifPutPixel(GifFileType *GifFile, GifPixelType GifPixel);
 int EGifPutComment(GifFileType *GifFile, const char *GifComment);
 int EGifPutExtensionLeader(GifFileType *GifFile, const int GifExtCode);
 int EGifPutExtensionBlock(GifFileType *GifFile, const int GifExtLen,
