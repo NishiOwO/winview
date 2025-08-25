@@ -260,3 +260,24 @@ double CeilNumber(double n) {
 	if(n < 0) return -1 + (int)n;
 	return 0;
 }
+
+void FillRectRotated(HDC dc, RECT* r, double angle, HBRUSH brush) {
+	double rad = angle / 180 * M_PI;
+	int    y, x;
+	for(y = 0; y < r->bottom - r->top; y++) {
+		for(x = 0; x < r->right - r->left; x++) {
+			RECT   rc;
+			double px = x - (r->right - r->left) / 2;
+			double py = y - (r->bottom - r->top) / 2;
+			double rx = r->left + (px * cos(rad) - py * sin(rad));
+			double ry = r->top + (px * sin(rad) + py * cos(rad));
+
+			rc.left	  = rx;
+			rc.top	  = ry;
+			rc.right  = CeilNumber(rx + 1);
+			rc.bottom = CeilNumber(ry + 1);
+
+			FillRect(dc, &rc, brush);
+		}
+	}
+}

@@ -14,6 +14,10 @@
 #include <sys/stat.h>
 #include <math.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265
+#endif
+
 /* currently */
 #define BETA
 
@@ -66,7 +70,6 @@ wvimage_t* TryTGADriver(const char* path);
 
 /* main.c */
 extern HINSTANCE hInst;
-extern HFONT	 fixedsys, bifixedsys, betafont;
 extern HWND	 hMain, hStatus, hProgress, hListbox;
 
 /* version.c */
@@ -98,6 +101,7 @@ WORD	   ReadAsBigWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsBigDWORD(unsigned char* ptr, int start);
 BOOL	   CompareStringSafely(const char* target, const char* comp); /* search for comp on target */
 double	   CeilNumber(double n);
+void	   FillRectRotated(HDC dc, RECT* r, double angle, HBRUSH brush);
 
 /* image.c */
 extern HWND hImage;
@@ -112,6 +116,6 @@ void	    NextImage(void);
 void	    ScaleImage(double d);
 
 /* font.c */
-void Draw8x8Text(HDC dc, const char* str, int x, int y, double scale, int r, int g, int b);
+void Draw8x8Text(HDC dc, const char* str, double rot, int x, int y, double scale, int r, int g, int b);
 
 #endif

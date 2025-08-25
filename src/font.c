@@ -131,10 +131,11 @@ static unsigned char font[128][8] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // U+007F
 };
 
-void Draw8x8Text(HDC dc, const char* str, int x, int y, double scale, int r, int g, int b) {
-	double orgx = x - (8 * strlen(str) * scale) / 2;
-	double orgy = y - (8 * scale) / 2;
+void Draw8x8Text(HDC dc, const char* str, double rot, int x, int y, double scale, int r, int g, int b) {
+	double orgx = x;
+	double orgy = y;
 	int    ix, iy, i;
+	double rad = rot / 180 * M_PI;
 
 	for(i = 0; str[i] != 0; i++) {
 		for(iy = 0; iy < 8; iy++) {
@@ -142,13 +143,21 @@ void Draw8x8Text(HDC dc, const char* str, int x, int y, double scale, int r, int
 			for(ix = 0; ix < 8; ix++) {
 				if(ch & 1) {
 					RECT   rc;
-					double xc = orgx + (i * 8 + ix) * scale;
-					double yc = orgy + iy * scale;
+					double xc = (i * 8 + ix) * scale;
+					double yc = iy * scale;
+					double rx;
+					double ry;
 
-					rc.left	  = xc;
-					rc.top	  = yc;
-					rc.right  = xc + CeilNumber(scale);
-					rc.bottom = yc + CeilNumber(scale);
+					xc -= (8 * strlen(str) * scale) / 2;
+					yc -= (8 * scale) / 2;
+
+					rx = xc * cos(rad) - yc * sin(rad);
+					ry = xc * sin(rad) + yc * cos(rad);
+
+					rc.left	  = orgx + rx;
+					rc.top	  = orgy + ry;
+					rc.right  = CeilNumber(orgx + rx + scale);
+					rc.bottom = CeilNumber(orgy + ry + scale);
 
 					FillRect(dc, &rc, GetSolidBrushCached(r, g, b));
 				}
