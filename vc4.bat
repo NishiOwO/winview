@@ -14,4 +14,4 @@ cd extern
 cl /c /D__inline__= /DPBS_SMOOTH=0 /DGetWindowLongPtr=GetWindowLong /DULONG_PTR=ULONG /DDOXPM /DDOXBM /DDOPNG /DDOJPEG /DDOTGA /DDOMSP /I..\..\external\libz\include /I..\..\external\libpng\include /I..\..\external\libjpeg\include /I..\..\include ..\..\external\libz\src\*.c ..\..\external\libpng\src\*.c ..\..\external\libjpeg\src\*.c
 cd ..
 
-link /out:winview.exe wv\*.obj extern\*.obj wv\*.res gdi32.lib comctl32.lib comdlg32.lib
+link /out:winview.exe wv\*.obj extern\*.obj wv\*.res gdi32.lib user32.lib comctl32.lib comdlg32.lib
