@@ -71,6 +71,7 @@ wvimage_t* TryTGADriver(const char* path);
 /* main.c */
 extern HINSTANCE hInst;
 extern HWND	 hMain, hStatus, hProgress, hListbox;
+extern HDC	 hMainDC;
 
 /* version.c */
 extern const char* wvversion;

@@ -246,7 +246,12 @@ DWORD WINAPI ImageThread(LPVOID param) {
 
 			row = wvimg->read(wvimg);
 			for(j = 0; j < wvimg->width; j++) {
-				RGBQUAD* px = &quad[i * wvimg->width + j];
+				RGBQUAD* px  = &quad[i * wvimg->width + j];
+				COLORREF c   = RGB(px->rgbRed, px->rgbGreen, px->rgbBlue);
+				c	     = GetNearestColor(hMainDC, c);
+				px->rgbRed   = (c >> 16) & 0xff;
+				px->rgbGreen = (c >> 8) & 0xff;
+				px->rgbBlue  = (c >> 0) & 0xff;
 
 				if(row == NULL) {
 					px->rgbRed   = 0;
@@ -274,11 +279,17 @@ DWORD WINAPI ImageThread(LPVOID param) {
 		for(i = 0; i < wvimg->height; i++) {
 			for(j = 0; j < wvimg->width; j++) {
 				RGBQUAD*       px  = &quad[i * wvimg->width + j];
+				COLORREF       c   = RGB(px->rgbRed, px->rgbGreen, px->rgbBlue);
 				unsigned char* src = &d[(i * wvimg->width + j) * 4];
 
 				px->rgbRed   = src[0];
 				px->rgbGreen = src[1];
 				px->rgbBlue  = src[2];
+
+				c	     = GetNearestColor(hMainDC, c);
+				px->rgbRed   = (c >> 16) & 0xff;
+				px->rgbGreen = (c >> 8) & 0xff;
+				px->rgbBlue  = (c >> 0) & 0xff;
 
 				ApplyPattern(px, j, i, src[3]);
 

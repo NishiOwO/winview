@@ -45,6 +45,7 @@ char exttext[1024];
 int  extseek = 0;
 
 HWND	  hMain, hStatus, hProgress, hListbox;
+HDC	  hMainDC;
 HINSTANCE hInst;
 HFONT	  fixedsys, bifixedsys, betafont;
 
@@ -195,6 +196,8 @@ BOOL InitWindow(int nCmdShow) {
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
+
+	hMainDC = GetDC(hWnd);
 
 	return TRUE;
 }

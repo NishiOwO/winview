@@ -15,7 +15,7 @@ static unsigned char* GIFDriverRead(void* ptr) {
 	wvimage_t*     img    = ptr;
 	gifopaque_t*   opaque = img->opaque;
 	unsigned char* row;
-	int i;
+	int	       i;
 
 	if(opaque->y >= img->height) return NULL;
 
