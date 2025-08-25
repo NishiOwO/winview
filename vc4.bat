@@ -1,5 +1,5 @@
 @echo off
-rd /s build
+rd /s /q build
 md build
 cd build
 
