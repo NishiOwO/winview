@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
 #ifndef _WIN32
 #include <unistd.h>
 #endif /* _WIN32 */
-#include <stdint.h>
 
 #define HT_SIZE 8192       /* 12bits = 4096 or twice as big! */
 #define HT_KEY_MASK 0x1FFF /* 13bits keys */
@@ -30,13 +29,13 @@ SPDX-License-Identifier: MIT
 #define HT_PUT_CODE(l) (l & 0x0FFF)
 
 typedef struct GifHashTableType {
-	uint32_t HTable[HT_SIZE];
+	GifUint32 HTable[HT_SIZE];
 } GifHashTableType;
 
 GifHashTableType *_InitHashTable(void);
 void _ClearHashTable(GifHashTableType *HashTable);
-void _InsertHashTable(GifHashTableType *HashTable, uint32_t Key, int Code);
-int _ExistsHashTable(GifHashTableType *HashTable, uint32_t Key);
+void _InsertHashTable(GifHashTableType *HashTable, GifUint32 Key, int Code);
+int _ExistsHashTable(GifHashTableType *HashTable, GifUint32 Key);
 
 #endif /* _GIF_HASH_H_ */
 

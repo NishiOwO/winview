@@ -229,13 +229,13 @@ void GifDrawBoxedText8x8(SavedImage *Image, const int x, const int y,
 	/* FIXME: should return bad status, but that would require API change */
 	if (dup != NULL) {
 		int i = 0;
+		char* lasts;
 		/* fill the box */
 		GifDrawRectangle(
 		    Image, x + 1, y + 1,
 		    border + TextWidth * GIF_FONT_WIDTH + border - 1,
 		    border + LineCount * GIF_FONT_HEIGHT + border - 1, bg);
 		(void)strcpy(dup, (char *)legend);
-		char *lasts;
 		cp = strtok_r(dup, "\r\n", &lasts);
 		do {
 			int leadspace = 0;

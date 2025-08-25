@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
 
 #include <fcntl.h>
 #include <limits.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -247,7 +246,7 @@ GifFileType *DGifOpen(void *userData, InputFunc readFunc, int *Error) {
 ******************************************************************************/
 int DGifGetScreenDesc(GifFileType *GifFile) {
 	int BitsPerPixel;
-	bool SortFlag;
+	GifBool SortFlag;
 	GifByteType Buf[3];
 	GifFilePrivateType *Private = (GifFilePrivateType *)GifFile->Private;
 
@@ -382,7 +381,7 @@ int DGifGetImageHeader(GifFileType *GifFile) {
 		return GIF_ERROR;
 	}
 	BitsPerPixel = (Buf[0] & 0x07) + 1;
-	GifFile->Image.Interlace = (Buf[0] & 0x40) ? true : false;
+	GifFile->Image.Interlace = (Buf[0] & 0x40) ? GifTrue : GifFalse;
 
 	/* Setup the colormap */
 	if (GifFile->Image.ColorMap) {
@@ -657,7 +656,7 @@ int DGifSavedExtensionToGCB(GifFileType *GifFile, int ImageIndex,
 	}
 
 	GCB->DisposalMode = DISPOSAL_UNSPECIFIED;
-	GCB->UserInputFlag = false;
+	GCB->UserInputFlag = GifFalse;
 	GCB->DelayTime = 0;
 	GCB->TransparentColor = NO_TRANSPARENT_COLOR;
 
@@ -1151,13 +1150,15 @@ static int DGifBufferedInput(GifFileType *GifFile, GifByteType *Buf,
  SavedImages may point to the spoilt image and null pointer buffers.
 *******************************************************************************/
 void DGifDecreaseImageCounter(GifFileType *GifFile) {
+	SavedImage *correct_saved_images;
+
 	GifFile->ImageCount--;
 	if (GifFile->SavedImages[GifFile->ImageCount].RasterBits != NULL) {
 		free(GifFile->SavedImages[GifFile->ImageCount].RasterBits);
 	}
 
 	// Realloc array according to the new image counter.
-	SavedImage *correct_saved_images = (SavedImage *)reallocarray(
+	correct_saved_images = (SavedImage *)reallocarray(
 	    GifFile->SavedImages, GifFile->ImageCount, sizeof(SavedImage));
 	if (correct_saved_images != NULL) {
 		GifFile->SavedImages = correct_saved_images;

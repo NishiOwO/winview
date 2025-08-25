@@ -14,13 +14,12 @@ SPDX-License-Identifier: MIT
 *****************************************************************************/
 
 #include <fcntl.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "gif_hash.h"
 #include "gif_lib.h"
+#include "gif_hash.h"
 #include "gif_lib_private.h"
 
 /* #define  DEBUG_HIT_RATE    Debug number of misses per hash Insert/Exists. */
@@ -29,7 +28,7 @@ SPDX-License-Identifier: MIT
 static long NumberOfTests = 0, NumberOfMisses = 0;
 #endif /* DEBUG_HIT_RATE */
 
-static int KeyItem(uint32_t Item);
+static int KeyItem(GifUint32 Item);
 
 /******************************************************************************
  Initialize HashTable - allocate the memory needed and clear it.	      *
@@ -52,16 +51,16 @@ GifHashTableType *_InitHashTable(void) {
  This part is a little machine depended. Use the commented part otherwise.   *
 ******************************************************************************/
 void _ClearHashTable(GifHashTableType *HashTable) {
-	memset(HashTable->HTable, 0xFF, HT_SIZE * sizeof(uint32_t));
+	memset(HashTable->HTable, 0xFF, HT_SIZE * sizeof(GifUint32));
 }
 
 /******************************************************************************
  Routine to insert a new Item into the HashTable. The data is assumed to be  *
  new one.								      *
 ******************************************************************************/
-void _InsertHashTable(GifHashTableType *HashTable, uint32_t Key, int Code) {
+void _InsertHashTable(GifHashTableType *HashTable, GifUint32 Key, int Code) {
 	int HKey = KeyItem(Key);
-	uint32_t *HTable = HashTable->HTable;
+	GifUint32 *HTable = HashTable->HTable;
 
 #ifdef DEBUG_HIT_RATE
 	NumberOfTests++;
@@ -81,9 +80,9 @@ void _InsertHashTable(GifHashTableType *HashTable, uint32_t Key, int Code) {
  Routine to test if given Key exists in HashTable and if so returns its code *
  Returns the Code if key was found, -1 if not.				      *
 ******************************************************************************/
-int _ExistsHashTable(GifHashTableType *HashTable, uint32_t Key) {
+int _ExistsHashTable(GifHashTableType *HashTable, GifUint32 Key) {
 	int HKey = KeyItem(Key);
-	uint32_t *HTable = HashTable->HTable, HTKey;
+	GifUint32 *HTable = HashTable->HTable, HTKey;
 
 #ifdef DEBUG_HIT_RATE
 	NumberOfTests++;
@@ -110,7 +109,7 @@ int _ExistsHashTable(GifHashTableType *HashTable, uint32_t Key) {
  Because the average hit ratio is only 2 (2 hash references per entry),      *
  evaluating more complex keys (such as twin prime keys) does not worth it!   *
 ******************************************************************************/
-static int KeyItem(uint32_t Item) {
+static int KeyItem(GifUint32 Item) {
 	return ((Item >> 12) ^ Item) & HT_KEY_MASK;
 }
 

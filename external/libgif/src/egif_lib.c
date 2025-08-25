@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 *****************************************************************************/
 
 #include <fcntl.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +56,7 @@ static int EGifBufferedOutput(GifFileType *GifFile, GifByteType *Buf, int c);
  Returns a dynamically allocated GifFileType pointer which serves as the GIF
  info record. The Error member is cleared if successful.
 ******************************************************************************/
-GifFileType *EGifOpenFileName(const char *FileName, const bool TestExistence,
+GifFileType *EGifOpenFileName(const char *FileName, const GifBool TestExistence,
                               int *Error) {
 
 	int FileHandle;
@@ -131,7 +130,7 @@ GifFileType *EGifOpenFileHandle(const int FileHandle, int *Error) {
 	Private->FileHandle = FileHandle;
 	Private->File = f;
 	Private->FileState = FILE_STATE_WRITE;
-	Private->gif89 = false;
+	Private->gif89 = GifFalse;
 
 	Private->Write = (OutputFunc)0;   /* No user write routine (MRB) */
 	GifFile->UserData = (void *)NULL; /* No user write handle (MRB) */
@@ -188,7 +187,7 @@ GifFileType *EGifOpen(void *userData, OutputFunc writeFunc, int *Error) {
 	Private->Write = writeFunc;   /* User write routine (MRB) */
 	GifFile->UserData = userData; /* User write handle (MRB) */
 
-	Private->gif89 = false; /* initially, write GIF87 */
+	Private->gif89 = GifFalse; /* initially, write GIF87 */
 
 	GifFile->Error = 0;
 
@@ -218,7 +217,7 @@ const char *EGifGetGifVersion(GifFileType *GifFile) {
 			    function == GRAPHICS_EXT_FUNC_CODE ||
 			    function == PLAINTEXT_EXT_FUNC_CODE ||
 			    function == APPLICATION_EXT_FUNC_CODE) {
-				Private->gif89 = true;
+				Private->gif89 = GifTrue;
 			}
 		}
 	}
@@ -229,7 +228,7 @@ const char *EGifGetGifVersion(GifFileType *GifFile) {
 		    function == GRAPHICS_EXT_FUNC_CODE ||
 		    function == PLAINTEXT_EXT_FUNC_CODE ||
 		    function == APPLICATION_EXT_FUNC_CODE) {
-			Private->gif89 = true;
+			Private->gif89 = GifTrue;
 		}
 	}
 
@@ -242,12 +241,12 @@ const char *EGifGetGifVersion(GifFileType *GifFile) {
 
 /******************************************************************************
  Set the GIF version. In the extremely unlikely event that there is ever
- another version, replace the bool argument with an enum in which the
- GIF87 value is 0 (numerically the same as bool false) and the GIF89 value
- is 1 (numerically the same as bool true).  That way we'll even preserve
+ another version, replace the GifBool argument with an enum in which the
+ GIF87 value is 0 (numerically the same as GifBool GifFalse) and the GIF89 value
+ is 1 (numerically the same as GifBool GifTrue).  That way we'll even preserve
  object-file compatibility!
 ******************************************************************************/
-void EGifSetGifVersion(GifFileType *GifFile, const bool gif89) {
+void EGifSetGifVersion(GifFileType *GifFile, const GifBool gif89) {
 	GifFilePrivateType *Private = (GifFilePrivateType *)GifFile->Private;
 
 	Private->gif89 = gif89;
@@ -365,7 +364,7 @@ int EGifPutScreenDesc(GifFileType *GifFile, const int Width, const int Height,
  call to any of the pixel dump routines.
 ******************************************************************************/
 int EGifPutImageDesc(GifFileType *GifFile, const int Left, const int Top,
-                     const int Width, const int Height, const bool Interlace,
+                     const int Width, const int Height, const GifBool Interlace,
                      const ColorMapObject *ColorMap) {
 	GifByteType Buf[3];
 	GifFilePrivateType *Private = (GifFilePrivateType *)GifFile->Private;
@@ -895,7 +894,7 @@ static int EGifCompressLine(GifFileType *GifFile, const GifPixelType *Line,
 		 * char.
 		 */
 		int NewCode;
-		unsigned long NewKey = (((uint32_t)CrntCode) << 8) + Pixel;
+		unsigned long NewKey = (((GifUint32)CrntCode) << 8) + Pixel;
 		if ((NewCode = _ExistsHashTable(HashTable, NewKey)) >= 0) {
 			/* This Key is already there, or the string is old one,
 			 * so simple take new code as our CrntCode:

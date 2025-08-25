@@ -9,12 +9,11 @@ SPDX-License-Identifier: MIT
 *****************************************************************************/
 
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stdio.h>
 
 #include "gif_lib.h"
 
-bool GifNoisyPrint = false;
+GifBool GifNoisyPrint = GifFalse;
 
 /*****************************************************************************
  Same as fprintf to stderr but with optional print.

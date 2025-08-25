@@ -13,7 +13,12 @@ SPDX-License-Identifier: MIT
 #include "gif_lib.h"
 
 #ifndef SIZE_MAX
+#ifdef UINTPTR_MAX
 #define SIZE_MAX UINTPTR_MAX
+#else
+/* impressively old compiler */
+#define SIZE_MAX 4294967295
+#endif
 #endif
 
 #define EXTENSION_INTRODUCER 0x21
@@ -59,7 +64,7 @@ typedef struct GifFilePrivateType {
 	GifByteType Suffix[LZ_MAX_CODE + 1]; /* So we can trace the codes. */
 	GifPrefixType Prefix[LZ_MAX_CODE + 1];
 	GifHashTableType *HashTable;
-	bool gif89;
+	GifBool gif89;
 } GifFilePrivateType;
 
 #ifndef HAVE_REALLOCARRAY

@@ -63,7 +63,7 @@ ColorMapObject *GifMakeMapObject(int ColorCount, const GifColorType *ColorMap) {
 
 	Object->ColorCount = ColorCount;
 	Object->BitsPerPixel = GifBitSize(ColorCount);
-	Object->SortFlag = false;
+	Object->SortFlag = GifFalse;
 
 	if (ColorMap != NULL) {
 		memcpy((char *)Object->Colors, (char *)ColorMap,

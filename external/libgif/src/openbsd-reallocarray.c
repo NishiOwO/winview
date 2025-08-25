@@ -4,12 +4,19 @@
  */
 
 #include <errno.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
 
+#if __STDC_VERSION__ >= 199901L
+#include <stdint.h>
+#endif
+
 #ifndef SIZE_MAX
+#ifdef UINTPTR_MAX
 #define SIZE_MAX UINTPTR_MAX
+#else
+#define SIZE_MAX 4294967295
+#endif
 #endif
 
 /*
