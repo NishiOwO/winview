@@ -15,7 +15,10 @@ button_t buttons[] = {
     {"&Delete", 'D', 0, NULL} /**/
 };
 
-const char* exts[] = {
+const char** exts = NULL;
+
+const char* default_exts[] = {
+#ifdef INTEGRATE
 #ifdef DOJPEG
     "JPEG",    "*.jpg;*.jpeg", /**/
 #endif
@@ -39,6 +42,7 @@ const char* exts[] = {
 #endif
 #ifdef DOXPM
     "XPM",     "*.xpm", /**/
+#endif
 #endif
 };
 char exttext[1024];
@@ -265,26 +269,6 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	int    i;
 	char   allsupport[1024];
 
-	allsupport[0] = 0;
-
-	memset(exttext, 0, sizeof(exttext));
-	for(i = 0; i < sizeof(exts) / sizeof(exts[0]); i += 2) {
-		if(strlen(allsupport) == 0) {
-			strcpy(allsupport, exts[i + 1]);
-		} else {
-			strcat(allsupport, ";");
-			strcat(allsupport, exts[i + 1]);
-		}
-	}
-
-	AddEntry("All Supported Formats", allsupport);
-
-	for(i = 0; i < sizeof(exts) / sizeof(exts[0]); i += 2) {
-		AddEntry(exts[i], exts[i + 1]);
-	}
-
-	AddEntry("All files", "*.*");
-
 	hInst = hCurInst;
 	if(!InitClass()) {
 		return FALSE;
@@ -295,6 +279,32 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	}
 
 	InitCommonControls();
+
+#ifdef INTEGRATE
+	for(i = 0; i < sizeof(default_exts) / sizeof(default_exts[0]); i++){
+		arrput(exts, default_exts[i]);
+	}
+#endif
+
+	allsupport[0] = 0;
+
+	memset(exttext, 0, sizeof(exttext));
+	for(i = 0; i < arrlen(exts); i += 2) {
+		if(strlen(allsupport) == 0) {
+			strcpy(allsupport, exts[i + 1]);
+		} else {
+			strcat(allsupport, ";");
+			strcat(allsupport, exts[i + 1]);
+		}
+	}
+
+	AddEntry("All Supported Formats", allsupport);
+
+	for(i = 0; i < arrlen(exts); i += 2) {
+		AddEntry(exts[i], exts[i + 1]);
+	}
+
+	AddEntry("All files", "*.*");
 
 	if(!InitWindow(nCmdShow)) {
 		return FALSE;

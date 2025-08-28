@@ -1,6 +1,6 @@
 @echo off
 
-set ARGS=/c /D__inline__= /DPBS_SMOOTH=0 /DGetWindowLongPtr=GetWindowLong /DULONG_PTR=ULONG /DDOXPM /DDOXBM /DDOPNG /DDOJPEG /DDOTGA /DDOMSP /DDOGIF /I..\..\external\libz\include /I..\..\external\libpng\include /I..\..\external\libjpeg\include /I..\..\external\libgif\include /I..\..\include
+set ARGS=/c /D__inline__= /DPBS_SMOOTH=0 /DGetWindowLongPtr=GetWindowLong /DULONG_PTR=ULONG /DDOXPM /DDOXBM /DDOPNG /DDOJPEG /DDOTGA /DDOMSP /DDOGIF /I..\..\external\libz\include /I..\..\external\libpng\include /I..\..\external\libjpeg\include /I..\..\external\libgif\include /I..\..\include /DINTEGRATE
 
 rd /s /q build
 md build

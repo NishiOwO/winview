@@ -57,7 +57,10 @@ void QueueImage(const char* path, const char* title) {
 	}
 }
 
-DriverProc* drivers[] = {
+DriverProc** drivers = NULL;
+
+DriverProc* default_drivers[] = {
+#ifdef INTEGRATE
 #ifdef DOGIF
     TryGIFDriver,
 #endif
@@ -81,6 +84,7 @@ DriverProc* drivers[] = {
 #endif
 #ifdef DOTGA
     TryTGADriver,
+#endif
 #endif
 };
 
@@ -199,7 +203,7 @@ DWORD WINAPI ImageThread(LPVOID param) {
 	}
 	UnlockWinViewMutex(mutex);
 
-	for(i = 0; i < sizeof(drivers) / sizeof(drivers[0]); i++) {
+	for(i = 0; i < arrlen(drivers); i++) {
 		if(drivers[i] == NULL) continue;
 		wvimg = drivers[i](image->path);
 
@@ -319,6 +323,13 @@ DWORD WINAPI ImageThread(LPVOID param) {
 
 BOOL InitImageClass(void) {
 	WNDCLASSEX wc;
+	int i;
+
+#ifdef INTEGRATE
+	for(i = 0; i < sizeof(default_drivers) / sizeof(default_drivers[0]); i++){
+		arrput(drivers, default_drivers[i]);
+	}
+#endif
 
 	mutex = CreateWinViewMutex();
 

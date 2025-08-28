@@ -1,3 +1,5 @@
+DEFS = -DINTEGRATE
+
 TARGET = x86_64-w64-mingw32-
 CC = $(TARGET)gcc
 AR = $(TARGET)ar
@@ -12,11 +14,10 @@ LIBS = -lgdi32 -lcomctl32 -lcomdlg32
 .PHONY: all clean get-version format
 .SUFFIXES: .c .o .rc .res
 
-all: winview.exe
+all: winview.exe $(TARGETS)
 
 OBJS += src/ds.o src/util.o src/font.o
 OBJS += src/ui/main.o src/ui/version.o src/ui/image.o src/ui/credits.o
-OBJS += src/format/tiff.o src/format/png.o src/format/jpeg.o src/format/xpm.o src/format/gif.o src/format/tga.o src/format/bmp.o src/format/msp.o src/format/xbm.o
 OBJS += src/winview.res
 include config.mk
 
