@@ -17,6 +17,7 @@ typedef struct image {
 
 int		 ImageWidth, ImageHeight;
 HWND		 hImage = NULL;
+HANDLE* formats = NULL;
 static image_t*	 shown	= NULL;
 static image_t** images = NULL;
 static HANDLE	 mutex	= NULL;

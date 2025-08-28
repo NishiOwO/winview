@@ -8,6 +8,14 @@ foreach my $i (@all){
 
 open(OUT, ">", "config.mk");
 
+sub dll {
+	my $targets = "src/format/$_[0].o $_[1]";
+
+	print OUT ("TARGETS += fmt_$_[0].dll\n");
+	print OUT ("fmt_$_[0].dll: $targets\n");
+	print OUT ("\t\$(CC) -shared \$(LDFLAGS) -o \$@ $targets\n");
+}
+
 sub has_in {
 	return grep(/^$_[0]$/, @enabled);
 }
@@ -29,9 +37,7 @@ sub scan_proj {
 
 	print OUT ("\n");
 
-	if(has_in("Integrate")){
-		print OUT ("CFLAGS += -Iexternal/$_[0]/include\n");
-	}
+	print OUT ("CFLAGS += -Iexternal/$_[0]/include\n");
 
 	if(defined($_[1])){
 		print OUT ("CFLAGS += -D$_[1]\n");
@@ -47,10 +53,18 @@ sub scan_proj {
 			print OUT ("OBJS += src/format/$fmt.o\n");
 			print OUT ("OBJS += external/$_[0].a\n");
 		}else{
-			print OUT ("TARGETS += fmt_$_[0].dll\n");
+			my $fmt = $_[0];
+			my $targets = "";
+			$fmt =~ s/^lib//;
+
+			if(($_[0] eq "libpng") or ($_[0] eq "libtiff")){
+				$targets = "$targets external/libz.a";
+			}
+
+			dll($fmt, "src/genutil.o src/ds.o external/$_[0].a $targets", "");
 		}
 	}
-
+\
 	print OUT ("external/$_[0].a: \$(" . uc($_[0]) . "_OBJS)\n");
 	print OUT ("\t\$(AR) rcs \$@ \$(" . uc($_[0]) . "_OBJS)\n");
 	print OUT ("\n");
@@ -117,6 +131,8 @@ foreach my $i (@enabled){
 		print OUT ("\n");
 		if(has_in("Integrate")){
 			print OUT ("OBJS += src/format/$i.o\n");
+		}else{
+			dll($i, "src/genutil.o src/ds.o", "");
 		}
 	}
 

@@ -86,6 +86,11 @@ HBRUSH	   GetHatchBrushCached(int r, int g, int b);
 void	   ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h);
 void	   SetProgress(int value);
 void	   SetStatus(const char* text);
+void	   ReadyStatus(void);
+void	   AdjustImageWindowSize(void);
+void	   FillRectRotated(HDC dc, RECT* r, double angle, HBRUSH brush);
+
+/* genutil.c */
 char*	   DuplicateString(const char* str);
 wvimage_t* AllocateImage(void);
 HANDLE	   CreateWinViewMutex(void);
@@ -93,8 +98,6 @@ void	   DestroyWinViewMutex(HANDLE mutex);
 void	   LockWinViewMutex(HANDLE mutex);
 void	   UnlockWinViewMutex(HANDLE mutex);
 void	   CreateWinViewBitmap(int w, int h, HBITMAP* bmp, RGBQUAD** quad);
-void	   ReadyStatus(void);
-void	   AdjustImageWindowSize(void);
 DWORD	   ParseHex(const char* str, int len);
 WORD	   ReadAsLittleWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsLittleDWORD(unsigned char* ptr, int start);
@@ -102,12 +105,12 @@ WORD	   ReadAsBigWORD(unsigned char* ptr, int start);
 DWORD	   ReadAsBigDWORD(unsigned char* ptr, int start);
 BOOL	   CompareStringSafely(const char* target, const char* comp); /* search for comp on target */
 double	   CeilNumber(double n);
-void	   FillRectRotated(HDC dc, RECT* r, double angle, HBRUSH brush);
 
 /* image.c */
 extern HWND hImage;
 extern int  ImageWidth;
 extern int  ImageHeight;
+extern HANDLE* formats;
 void	    QueueImage(const char* path, const char* title);
 void	    ShowImage(int index);
 void	    DeleteImage(int index);
