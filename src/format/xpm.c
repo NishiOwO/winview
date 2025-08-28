@@ -79,6 +79,9 @@ static void XPMDriverClose(void* ptr) {
 	free(img);
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "XPM";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.xpm";
+
 wvimage_t* TryXPMDriver(const char* path) {
 	FILE*	     f = fopen(path, "rb");
 	wvimage_t*   img;
@@ -102,7 +105,7 @@ wvimage_t* TryXPMDriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "XPM";
+	img->name  = DriverName;
 	img->close = XPMDriverClose;
 	img->read  = XPMDriverRead;
 
@@ -226,4 +229,6 @@ wvimage_t* TryXPMDriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

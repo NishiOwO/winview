@@ -84,6 +84,9 @@ static unsigned char* MSPDriverRead(void* ptr) {
 	return row;
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "MSP";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.msp";
+
 static void MSPDriverClose(void* ptr) {
 	wvimage_t*   img    = ptr;
 	mspopaque_t* opaque = img->opaque;
@@ -118,7 +121,7 @@ wvimage_t* TryMSPDriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "MSPaint";
+	img->name  = DriverName;
 	img->close = MSPDriverClose;
 	img->read  = MSPDriverRead;
 
@@ -137,4 +140,6 @@ wvimage_t* TryMSPDriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

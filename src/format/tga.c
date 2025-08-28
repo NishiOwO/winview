@@ -167,6 +167,9 @@ static void TGADriverClose(void* ptr) {
 	free(img);
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "TGA";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.tga";
+
 wvimage_t* TryTGADriver(const char* path) {
 	FILE*	      f = fopen(path, "rb");
 	wvimage_t*    img;
@@ -206,7 +209,7 @@ wvimage_t* TryTGADriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "TGA";
+	img->name  = DriverName;
 	img->close = TGADriverClose;
 	img->read  = TGADriverRead;
 
@@ -240,4 +243,6 @@ wvimage_t* TryTGADriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

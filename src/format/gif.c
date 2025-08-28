@@ -119,6 +119,9 @@ static void GIFDriverClose(void* ptr) {
 	free(img);
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "GIF";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.gif";
+
 wvimage_t* TryGIFDriver(const char* path) {
 	wvimage_t*   img;
 	gifopaque_t* opaque;
@@ -150,10 +153,12 @@ wvimage_t* TryGIFDriver(const char* path) {
 	opaque->y    = 0;
 	opaque->file = file;
 
-	img->name   = "GIF";
+	img->name   = DriverName;
 	img->width  = file->SWidth;
 	img->height = file->SHeight;
 
 	return img;
 }
+
+END_FORMAT;
 #endif

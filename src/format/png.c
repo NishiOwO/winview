@@ -33,6 +33,9 @@ static void PNGDriverClose(void* ptr) {
 	free(img);
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "PNG";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.png";
+
 wvimage_t* TryPNGDriver(const char* path) {
 	FILE*	     f = fopen(path, "rb");
 	wvimage_t*   img;
@@ -42,7 +45,7 @@ wvimage_t* TryPNGDriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "PNG";
+	img->name  = DriverName;
 	img->close = PNGDriverClose;
 	img->read  = PNGDriverRead;
 
@@ -76,4 +79,6 @@ wvimage_t* TryPNGDriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

@@ -1,5 +1,6 @@
 #include <wvcommon.h>
 #include <wvresource.h>
+#include <wvdefault.h>
 
 typedef struct button {
 	const char* text;
@@ -17,34 +18,6 @@ button_t buttons[] = {
 
 const char** exts = NULL;
 
-const char* default_exts[] = {
-#ifdef INTEGRATE
-#ifdef DOJPEG
-    "JPEG",    "*.jpg;*.jpeg", /**/
-#endif
-#ifdef DOPNG
-    "PNG",     "*.png", /**/
-#endif
-#ifdef DOTIFF
-    "TIFF",    "*.tiff;*.tif", /**/
-#endif
-#ifdef DOGIF
-    "GIF",     "*.gif", /**/
-#endif
-#ifdef DOMSP
-    "MSPaint", "*.msp", /**/
-#endif
-#ifdef DOTGA
-    "TGA",     "*.tga", /**/
-#endif
-#ifdef DOXBM
-    "XBM",     "*.xbm", /**/
-#endif
-#ifdef DOXPM
-    "XPM",     "*.xpm", /**/
-#endif
-#endif
-};
 char exttext[1024];
 int  extseek = 0;
 
@@ -281,10 +254,11 @@ int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, in
 	InitCommonControls();
 
 #ifdef INTEGRATE
-	for(i = 0; i < sizeof(default_exts) / sizeof(default_exts[0]); i++){
+	for(i = 0; i < sizeof(default_exts) / sizeof(default_exts[0]); i++) {
 		arrput(exts, default_exts[i]);
 	}
 #endif
+	LoadFormatDrivers("fmt_*.dll");
 
 	allsupport[0] = 0;
 

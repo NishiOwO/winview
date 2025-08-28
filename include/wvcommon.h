@@ -18,6 +18,8 @@
 #define M_PI 3.14159265
 #endif
 
+#define WVCAPI __cdecl
+
 /* currently */
 #define BETA
 
@@ -44,7 +46,9 @@ typedef struct wvimage {
 	void (*close)(void* ptr);
 	unsigned char* (*read)(void* ptr);
 } wvimage_t;
-typedef wvimage_t*(DriverProc)(const char* path);
+typedef wvimage_t*(WVCAPI* DriverProc)(const char* path);
+typedef const char*(WVCAPI* DriverNameProc)(void);
+typedef const char*(WVCAPI* DriverExtsProc)(void);
 
 typedef struct RGBAPack_ {
 	unsigned char red;
@@ -58,7 +62,31 @@ typedef struct RGBAPack_ {
 	memset(var, 0, sizeof(*var));
 #define CreateRGBA(r, g, b, a) (((r) << 24) | ((g) << 16) | ((b) << 8) | ((a) << 0))
 
+#ifdef INTEGRATE
+#define STATIC_IF_INTEGRATE static
+#define DRIVER_DECL(name) \
+	wvimage_t* WVCAPI  Try##name##Driver(const char* path); \
+	extern const char* name##Name; \
+	extern const char* name##Exts;
+#define END_FORMAT
+#else
+#define STATIC_IF_INTEGRATE
+#define DRIVER_DECL(name)
+#define END_FORMAT \
+	const char* WVCAPI GetDriverName(void) { return DriverName; } \
+	const char* WVCAPI GetDriverExts(void) { return DriverExts; }
+#endif
+
 /* image drivers */
+DRIVER_DECL(JPEG);
+DRIVER_DECL(PNG);
+DRIVER_DECL(TIFF);
+DRIVER_DECL(XPM);
+DRIVER_DECL(GIF);
+DRIVER_DECL(MSP);
+DRIVER_DECL(XBM);
+DRIVER_DECL(TGA);
+
 wvimage_t* TryJPEGDriver(const char* path);
 wvimage_t* TryPNGDriver(const char* path);
 wvimage_t* TryTIFFDriver(const char* path);
@@ -69,9 +97,10 @@ wvimage_t* TryXBMDriver(const char* path);
 wvimage_t* TryTGADriver(const char* path);
 
 /* main.c */
-extern HINSTANCE hInst;
-extern HWND	 hMain, hStatus, hProgress, hListbox;
-extern HDC	 hMainDC;
+extern HINSTANCE    hInst;
+extern HWND	    hMain, hStatus, hProgress, hListbox;
+extern HDC	    hMainDC;
+extern const char** exts;
 
 /* version.c */
 extern const char* wvversion;
@@ -81,14 +110,14 @@ LRESULT CALLBACK   VersionDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 LRESULT CALLBACK CreditsDialog(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
 /* util.c */
-HBRUSH	   GetSolidBrushCached(int r, int g, int b);
-HBRUSH	   GetHatchBrushCached(int r, int g, int b);
-void	   ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h);
-void	   SetProgress(int value);
-void	   SetStatus(const char* text);
-void	   ReadyStatus(void);
-void	   AdjustImageWindowSize(void);
-void	   FillRectRotated(HDC dc, RECT* r, double angle, HBRUSH brush);
+HBRUSH GetSolidBrushCached(int r, int g, int b);
+HBRUSH GetHatchBrushCached(int r, int g, int b);
+void   ShowBitmapSize(HDC hdc, const char* name, int x, int y, int w, int h);
+void   SetProgress(int value);
+void   SetStatus(const char* text);
+void   ReadyStatus(void);
+void   AdjustImageWindowSize(void);
+void   FillRectRotated(HDC dc, RECT* r, double angle, HBRUSH brush);
 
 /* genutil.c */
 char*	   DuplicateString(const char* str);
@@ -110,7 +139,6 @@ double	   CeilNumber(double n);
 extern HWND hImage;
 extern int  ImageWidth;
 extern int  ImageHeight;
-extern HANDLE* formats;
 void	    QueueImage(const char* path, const char* title);
 void	    ShowImage(int index);
 void	    DeleteImage(int index);
@@ -118,6 +146,7 @@ BOOL	    InitImageClass(void);
 void	    PreviousImage(void);
 void	    NextImage(void);
 void	    ScaleImage(double d);
+void	    LoadFormatDrivers(const char* wildcard);
 
 /* font.c */
 void Draw8x8Text(HDC dc, const char* str, double rot, int x, int y, double scale, int r, int g, int b);

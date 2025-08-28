@@ -48,6 +48,9 @@ static void JPEGDriverClose(void* ptr) {
 	free(img);
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "JPEG";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.jpeg;*.jpg";
+
 wvimage_t* TryJPEGDriver(const char* path) {
 	FILE*	      f = fopen(path, "rb");
 	wvimage_t*    img;
@@ -56,7 +59,7 @@ wvimage_t* TryJPEGDriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "JPEG";
+	img->name  = DriverName;
 	img->close = JPEGDriverClose;
 	img->read  = JPEGDriverRead;
 
@@ -84,4 +87,6 @@ wvimage_t* TryJPEGDriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

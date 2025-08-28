@@ -63,6 +63,9 @@ static void XBMDriverClose(void* ptr) {
 	free(img);
 }
 
+STATIC_IF_INTEGRATE const char* DriverName = "XBM";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.xbm";
+
 wvimage_t* TryXBMDriver(const char* path) {
 	FILE*	     f = fopen(path, "rb");
 	wvimage_t*   img;
@@ -132,7 +135,7 @@ wvimage_t* TryXBMDriver(const char* path) {
 
 	img = AllocateImage();
 
-	img->name  = "XBM";
+	img->name  = DriverName;
 	img->close = XBMDriverClose;
 	img->read  = XBMDriverRead;
 
@@ -147,4 +150,6 @@ wvimage_t* TryXBMDriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

@@ -45,6 +45,9 @@ static void TIFFDriverClose(void* ptr) {
 
 static void TIFFDriverError(const char* module, const char* fmt, va_list ap) {}
 
+STATIC_IF_INTEGRATE const char* DriverName = "TIFF";
+STATIC_IF_INTEGRATE const char* DriverExts = "*.tif;*.tiff";
+
 wvimage_t* TryTIFFDriver(const char* path) {
 	wvimage_t*    img;
 	tiffopaque_t* opaque;
@@ -54,7 +57,7 @@ wvimage_t* TryTIFFDriver(const char* path) {
 	img = AllocateImage();
 
 	img->type  = WVIMAGE_READ_FRAME;
-	img->name  = "TIFF";
+	img->name  = DriverName;
 	img->close = TIFFDriverClose;
 	img->read  = TIFFDriverRead;
 
@@ -76,4 +79,6 @@ wvimage_t* TryTIFFDriver(const char* path) {
 
 	return img;
 }
+
+END_FORMAT;
 #endif

@@ -1,4 +1,5 @@
 #include <wvcommon.h>
+#include <wvdefault.h>
 
 #define PATTERNSZ 16
 
@@ -17,7 +18,6 @@ typedef struct image {
 
 int		 ImageWidth, ImageHeight;
 HWND		 hImage = NULL;
-HANDLE* formats = NULL;
 static image_t*	 shown	= NULL;
 static image_t** images = NULL;
 static HANDLE	 mutex	= NULL;
@@ -58,36 +58,7 @@ void QueueImage(const char* path, const char* title) {
 	}
 }
 
-DriverProc** drivers = NULL;
-
-DriverProc* default_drivers[] = {
-#ifdef INTEGRATE
-#ifdef DOGIF
-    TryGIFDriver,
-#endif
-#ifdef DOPNG
-    TryPNGDriver,
-#endif
-#ifdef DOJPEG
-    TryJPEGDriver,
-#endif
-#ifdef DOTIFF
-    TryTIFFDriver,
-#endif
-#ifdef DOXPM
-    TryXPMDriver,
-#endif
-#ifdef DOMSP
-    TryMSPDriver,
-#endif
-#ifdef DOXBM
-    TryXBMDriver,
-#endif
-#ifdef DOTGA
-    TryTGADriver,
-#endif
-#endif
-};
+DriverProc* drivers = NULL;
 
 LRESULT CALLBACK ImageWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	if(msg == WM_CLOSE) {
@@ -324,10 +295,10 @@ DWORD WINAPI ImageThread(LPVOID param) {
 
 BOOL InitImageClass(void) {
 	WNDCLASSEX wc;
-	int i;
+	int	   i;
 
 #ifdef INTEGRATE
-	for(i = 0; i < sizeof(default_drivers) / sizeof(default_drivers[0]); i++){
+	for(i = 0; i < sizeof(default_drivers) / sizeof(default_drivers[0]); i++) {
 		arrput(drivers, default_drivers[i]);
 	}
 #endif
@@ -465,4 +436,79 @@ void ScaleImage(double d) {
 	style = (DWORD)GetWindowLongPtr(hImage, GWL_STYLE);
 	AdjustWindowRect(&r, style, FALSE);
 	SetWindowPos(hImage, NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOMOVE);
+}
+
+static void LoadFormatDriver(const char* name) {
+	HANDLE	       hDriver = LoadLibrary(name);
+	jmp_buf	       err;
+	DriverProc     proc;
+	DriverNameProc drvnameproc;
+	DriverExtsProc drvextsproc;
+	const char*    drvname;
+	const char*    drvexts;
+	char	       buf[512];
+
+	if(hDriver == NULL) return;
+	if(setjmp(err)) {
+		/***
+		 * i think libpng is affecting me...
+		 * but this makes code clean
+		 */
+		FreeLibrary(hDriver);
+		return;
+	}
+
+	drvnameproc = (DriverNameProc)GetProcAddress(hDriver, "GetDriverName");
+	if(drvnameproc == NULL) longjmp(err, 1);
+	drvname = drvnameproc();
+
+	drvextsproc = (DriverExtsProc)GetProcAddress(hDriver, "GetDriverExts");
+	if(drvextsproc == NULL) longjmp(err, 1);
+	drvexts = drvextsproc();
+
+	sprintf(buf, "Try%sDriver", drvname);
+	proc = (DriverProc)GetProcAddress(hDriver, buf);
+	if(proc == NULL) longjmp(err, 1);
+
+	arrput(exts, drvname);
+	arrput(exts, drvexts);
+
+	arrput(drivers, proc);
+}
+
+static int DriverSort(const void* _a, const void* _b) {
+	char* a = *(char**)_a;
+	char* b = *(char**)_b;
+	return strcmp(a, b);
+}
+
+void LoadFormatDrivers(const char* wildcard) {
+	WIN32_FIND_DATA ffd;
+	HANDLE		hFind;
+	char**		list = NULL;
+	int		i;
+
+	hFind = FindFirstFile(wildcard, &ffd);
+	if(hFind == INVALID_HANDLE_VALUE) {
+		return;
+	}
+
+	do {
+		char* s;
+		if(strcmp(ffd.cFileName, ".") == 0 || strcmp(ffd.cFileName, "..") == 0) continue;
+
+		s = DuplicateString(ffd.cFileName);
+		arrput(list, s);
+
+	} while(FindNextFile(hFind, &ffd) != 0);
+
+	FindClose(hFind);
+
+	qsort(list, arrlen(list), sizeof(char*), DriverSort);
+
+	for(i = 0; i < arrlen(list); i++) {
+		LoadFormatDriver(list[i]);
+		free(list[i]);
+	}
+	arrfree(list);
 }
